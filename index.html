@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Open Science Country Explorer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0f0f12;--surface:#17171c;--surface2:#1e1e26;--border:#2a2a35;
+  --accent:#7fffb2;--accent2:#5be8ff;--text:#e8e8f0;--text-muted:#7a7a90;--text-dim:#4a4a60;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.topbar{display:flex;align-items:center;gap:20px;padding:13px 22px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0}
+.logo{font-family:'DM Serif Display',serif;font-size:1.1rem;color:var(--accent);white-space:nowrap}
+.logo em{color:var(--text-muted);font-style:italic;font-size:0.85rem;margin-left:8px}
+.search-wrap{flex:1;max-width:300px;position:relative}
+.search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);opacity:0.35;pointer-events:none}
+#search{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:7px 12px 7px 32px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none;transition:border-color .2s}
+#search:focus{border-color:var(--accent)}
+#search::placeholder{color:var(--text-dim)}
+.count{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--text-muted);white-space:nowrap}
+.main{display:flex;flex:1;overflow:hidden}
+.sidebar{width:210px;flex-shrink:0;border-right:1px solid var(--border);overflow-y:auto;background:var(--surface)}
+.sidebar::-webkit-scrollbar{width:3px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.citem{padding:9px 14px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:6px;border-left:3px solid transparent;transition:all .12s}
+.citem:hover{background:var(--surface2)}
+.citem.active{background:var(--surface2);border-left-color:var(--accent)}
+.cname{font-size:0.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);pointer-events:none}
+.citem.active .cname{color:var(--accent);font-weight:500}
+.cmeta{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--text-dim);white-space:nowrap;pointer-events:none}
+.content{flex:1;overflow-y:auto;padding:30px 36px}
+.content::-webkit-scrollbar{width:5px}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--text-dim)}
+.empty svg{opacity:.25}
+.empty p{font-size:0.875rem}
+.loading{display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-dim);font-size:0.875rem;gap:10px}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ctitle{font-family:'DM Serif Display',serif;font-size:2.2rem;line-height:1.1;margin-bottom:4px}
+.csub{font-size:0.72rem;color:var(--text-muted);letter-spacing:.08em;text-transform:uppercase;font-weight:500;margin-bottom:24px}
+.indicators{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.ind-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;flex:1;min-width:180px}
+.ind-lbl{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.ind-val{font-size:0.82rem;color:var(--text);line-height:1.4}
+.sec-nav{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:22px}
+.sec-tab{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--text-muted);cursor:pointer;transition:all .15s}
+.sec-tab:hover{border-color:var(--text-muted);color:var(--text)}
+.sec-block{margin-bottom:24px;border:1px solid var(--border);border-radius:12px;overflow:hidden;scroll-margin-top:16px}
+.sec-hdr{padding:12px 18px;display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;background:var(--surface)}
+.sec-id{font-family:'DM Mono',monospace;font-size:0.7rem;font-weight:500;padding:2px 7px;border-radius:4px}
+.sec-ttl{font-size:0.875rem;font-weight:500;flex:1}
+.chevron{color:var(--text-dim);font-size:.85rem;transition:transform .2s;margin-left:auto}
+.sec-block.collapsed .chevron{transform:rotate(-90deg)}
+.sec-body{border-top:1px solid var(--border)}
+.sec-block.collapsed .sec-body{display:none}
+.q-block{padding:16px 18px;border-bottom:1px solid var(--border)}
+.q-block:last-child{border-bottom:none}
+.q-lbl{display:flex;align-items:flex-start;gap:8px;margin-bottom:9px}
+.qid{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--text-dim);background:var(--surface2);padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+.q-q{font-size:0.775rem;color:var(--text-muted);font-style:italic;line-height:1.4}
+.q-a{font-size:0.85rem;color:var(--text);line-height:1.68}
+.links-block{margin-bottom:24px;border:1px solid var(--border);border-radius:12px;overflow:hidden;scroll-margin-top:16px}
+.links-hdr{padding:12px 18px;display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;background:var(--surface)}
+.links-badge{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--text-muted);background:var(--surface2);padding:2px 7px;border-radius:10px;margin-left:auto}
+.links-body{border-top:1px solid var(--border);padding:16px 18px}
+.links-body.hidden{display:none}
+.lg-title{font-family:'DM Mono',monospace;font-size:0.62rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:7px;margin-top:14px}
+.lg-title:first-child{margin-top:0}
+.litem{display:flex;align-items:flex-start;gap:7px;margin-bottom:5px}
+.lqid{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--text-dim);background:var(--surface2);padding:2px 6px;border-radius:4px;white-space:nowrap;flex-shrink:0;margin-top:1px}
+.lurl{font-size:0.75rem;color:var(--accent2);word-break:break-all;line-height:1.4;text-decoration:none}
+.lurl:hover{opacity:.72;text-decoration:underline}
+.no-data{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 22px;color:var(--text-muted);font-size:0.85rem;font-style:italic}
+.err{background:var(--surface);border:1px solid #ff5555;border-radius:10px;padding:18px 22px;color:#ff7777;font-size:0.85rem}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="logo">Open Science Explorer <em>UNESCO 2021 · 82 countries</em></div>
+  <div class="search-wrap">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="search" placeholder="Search countries…" autocomplete="off">
+  </div>
+  <div class="count" id="count">82 countries</div>
+</div>
+<div class="main">
+  <div class="sidebar" id="sidebar"></div>
+  <div class="content" id="content">
+    <div class="empty">
+      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      <p>Select a country from the sidebar to view its profile</p>
+    </div>
+  </div>
+</div>
+<script>
+const COLORS = {'B1':'#7fffb2','B2':'#5be8ff','B3':'#ffcf6b','B4':'#ff8fa3','B5':'#b4a0ff','B6':'#ff9f6b','B7':'#a0d4ff','B8':'#d4a0ff','B9':'#ffd4a0'};
+const COUNTRIES = [{"name": "Albania", "file": "Albania_Profile.md"}, {"name": "Algeria", "file": "Algeria_Profile.md"}, {"name": "Angola", "file": "Angola_Profile.md"}, {"name": "Argentina", "file": "Argentina_Profile.md"}, {"name": "Armenia", "file": "Armenia_Profile.md"}, {"name": "Australia", "file": "Australia_Profile.md"}, {"name": "Austria", "file": "Austria_Profile.md"}, {"name": "Azerbaijan", "file": "Azerbaijan_Profile.md"}, {"name": "Bahrain", "file": "Bahrain_Profile.md"}, {"name": "Belarus", "file": "Belarus_Profile.md"}, {"name": "Belgium", "file": "Belgium_Profile.md"}, {"name": "Benin", "file": "Benin_Profile.md"}, {"name": "Brazil", "file": "Brazil_Profile.md"}, {"name": "Canada", "file": "Canada_Profile.md"}, {"name": "China", "file": "China_Profile.md"}, {"name": "Congo", "file": "Congo_Profile.md"}, {"name": "Costa Rica", "file": "Costa_Rica_Profile.md"}, {"name": "Cuba", "file": "Cuba_Profile.md"}, {"name": "Cyprus", "file": "Cyprus_Profile.md"}, {"name": "Czechia", "file": "Czechia_Profile.md"}, {"name": "Côte d'Ivoire", "file": "Côte_dIvoire_Profile.md"}, {"name": "Denmark", "file": "Denmark_Profile.md"}, {"name": "Dominican Republic", "file": "Dominican_Republic_Profile.md"}, {"name": "Ecuador", "file": "Ecuador_Profile.md"}, {"name": "Egypt", "file": "Egypt_Profile.md"}, {"name": "Finland", "file": "Finland_Profile.md"}, {"name": "France", "file": "France_Profile.md"}, {"name": "Gambia", "file": "Gambia_Profile.md"}, {"name": "Georgia", "file": "Georgia_Profile.md"}, {"name": "Germany", "file": "Germany_Profile.md"}, {"name": "Greece", "file": "Greece_Profile.md"}, {"name": "Guinea-Bissau", "file": "Guinea-Bissau_Profile.md"}, {"name": "Hungary", "file": "Hungary_Profile.md"}, {"name": "India", "file": "India_Profile.md"}, {"name": "Indonesia", "file": "Indonesia_Profile.md"}, {"name": "Iran (Islamic Republic of)", "file": "Iran_Islamic_Republic_of_Profile.md"}, {"name": "Iraq", "file": "Iraq_Profile.md"}, {"name": "Ireland", "file": "Ireland_Profile.md"}, {"name": "Italy", "file": "Italy_Profile.md"}, {"name": "Japan", "file": "Japan_Profile.md"}, {"name": "Latvia", "file": "Latvia_Profile.md"}, {"name": "Libya", "file": "Libya_Profile.md"}, {"name": "Lithuania", "file": "Lithuania_Profile.md"}, {"name": "Luxembourg", "file": "Luxembourg_Profile.md"}, {"name": "Malaysia", "file": "Malaysia_Profile.md"}, {"name": "Mali", "file": "Mali_Profile.md"}, {"name": "Mauritania", "file": "Mauritania_Profile.md"}, {"name": "Mauritius", "file": "Mauritius_Profile.md"}, {"name": "Mexico", "file": "Mexico_Profile.md"}, {"name": "Mongolia", "file": "Mongolia_Profile.md"}, {"name": "Morocco", "file": "Morocco_Profile.md"}, {"name": "Netherlands", "file": "Netherlands_Profile.md"}, {"name": "Niger", "file": "Niger_Profile.md"}, {"name": "Nigeria", "file": "Nigeria_Profile.md"}, {"name": "North Macedonia", "file": "North_Macedonia_Profile.md"}, {"name": "Norway", "file": "Norway_Profile.md"}, {"name": "Pakistan", "file": "Pakistan_Profile.md"}, {"name": "Peru", "file": "Peru_Profile.md"}, {"name": "Philippines", "file": "Philippines_Profile.md"}, {"name": "Portugal", "file": "Portugal_Profile.md"}, {"name": "Qatar", "file": "Qatar_Profile.md"}, {"name": "Republic of Korea", "file": "Republic_of_Korea_Profile.md"}, {"name": "Romania", "file": "Romania_Profile.md"}, {"name": "Russian Federation", "file": "Russian_Federation_Profile.md"}, {"name": "Saudi Arabia", "file": "Saudi_Arabia_Profile.md"}, {"name": "Senegal", "file": "Senegal_Profile.md"}, {"name": "Sierra Leone", "file": "Sierra_Leone_Profile.md"}, {"name": "Slovakia", "file": "Slovakia_Profile.md"}, {"name": "Slovenia", "file": "Slovenia_Profile.md"}, {"name": "South Africa", "file": "South_Africa_Profile.md"}, {"name": "State of Palestine", "file": "State_of_Palestine_Profile.md"}, {"name": "Sweden", "file": "Sweden_Profile.md"}, {"name": "Switzerland", "file": "Switzerland_Profile.md"}, {"name": "Thailand", "file": "Thailand_Profile.md"}, {"name": "Timor-Leste", "file": "Timor-Leste_Profile.md"}, {"name": "Togo", "file": "Togo_Profile.md"}, {"name": "Tunisia", "file": "Tunisia_Profile.md"}, {"name": "Türkiye", "file": "Türkiye_Profile.md"}, {"name": "Uganda", "file": "Uganda_Profile.md"}, {"name": "Ukraine", "file": "Ukraine_Profile.md"}, {"name": "United Republic of Tanzania", "file": "United_Republic_of_Tanzania_Profile.md"}, {"name": "Uzbekistan", "file": "Uzbekistan_Profile.md"}];
+
+let cur = null;
+const cache = {};
+
+// ── SIDEBAR ──────────────────────────────────────────────
+function buildSidebar(q) {
+  q = (q || '').toLowerCase();
+  const list = COUNTRIES.filter(c => c.name.toLowerCase().includes(q));
+  document.getElementById('count').textContent = list.length === 82 ? '82 countries' : list.length + ' / 82';
+  const sb = document.getElementById('sidebar');
+  sb.innerHTML = '';
+  list.forEach(function(c) {
+    const el = document.createElement('div');
+    el.className = 'citem' + (c.name === cur ? ' active' : '');
+    el.dataset.country = c.name;
+    el.dataset.file = c.file;
+    el.innerHTML = '<span class="cname">' + esc(c.name) + '</span><span class="cmeta">·</span>';
+    sb.appendChild(el);
+  });
+}
+
+document.getElementById('sidebar').addEventListener('click', function(e) {
+  const item = e.target.closest('.citem');
+  if (!item) return;
+  pick(item.dataset.country, item.dataset.file);
+});
+
+// ── FETCH & PARSE ─────────────────────────────────────────
+async function pick(name, file) {
+  if (cur === name) return;
+  cur = name;
+  document.querySelectorAll('.citem').forEach(function(e) {
+    e.classList.toggle('active', e.dataset.country === name);
+  });
+
+  const ct = document.getElementById('content');
+  if (cache[name]) { render(name, cache[name], ct); return; }
+
+  ct.innerHTML = '<div class="loading"><div class="spinner"></div>Loading ' + esc(name) + '…</div>';
+
+  try {
+    const res = await fetch(file);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const md = await res.text();
+    const parsed = parseMd(md);
+    cache[name] = parsed;
+    if (cur === name) render(name, parsed, ct);
+  } catch(err) {
+    if (cur === name) ct.innerHTML = '<div class="err">Could not load ' + esc(file) + ': ' + esc(err.message) + '</div>';
+  }
+}
+
+// ── MARKDOWN PARSER ───────────────────────────────────────
+function parseMd(md) {
+  const lines = md.split('\n');
+  const result = { indicators: {}, sections: [], links: {} };
+  let curSection = null, curQ = null, curText = [], inLinks = false, inIndicators = false, curLinkGroup = null;
+
+  function flushQ() {
+    if (curQ && curSection) {
+      curSection.questions.push({ id: curQ.id, q: curQ.q, text: curText.join(' ').trim() });
+    }
+    curQ = null; curText = [];
+  }
+
+  lines.forEach(function(line) {
+    // H2
+    if (line.startsWith('## ')) {
+      flushQ();
+      const title = line.slice(3).trim();
+      if (title === 'Key Indicators') { inIndicators = true; inLinks = false; curSection = null; return; }
+      if (title === 'Links') { inLinks = true; inIndicators = false; if (curSection) result.sections.push(curSection); curSection = null; return; }
+      inIndicators = false; inLinks = false;
+      if (curSection) result.sections.push(curSection);
+      curSection = { title: title, questions: [] };
+      return;
+    }
+    // H3
+    if (line.startsWith('### ')) {
+      const title = line.slice(4).trim();
+      if (inLinks) { curLinkGroup = title; return; }
+      flushQ();
+      const parts = title.split(' — ');
+      curQ = { id: parts[0] ? parts[0].trim() : '', q: parts[1] ? parts[1].trim() : title };
+      return;
+    }
+    // Indicators
+    if (inIndicators) {
+      const m = line.match(/^\*\*(.+?):\*\*\s*(.*)/);
+      if (m) result.indicators[m[1]] = m[2].trim();
+      return;
+    }
+    // Links
+    if (inLinks) {
+      const m = line.match(/^- \[(.+?)\]\s+(https?:\/\/\S+)/);
+      if (m && curLinkGroup) {
+        if (!result.links[curLinkGroup]) result.links[curLinkGroup] = [];
+        result.links[curLinkGroup].push({ qid: m[1], url: m[2] });
+      }
+      return;
+    }
+    // Body
+    if (curQ && line.trim() && !line.startsWith('---') && !line.startsWith('*')) {
+      curText.push(line.trim());
+    }
+  });
+
+  flushQ();
+  if (curSection) result.sections.push(curSection);
+  return result;
+}
+
+// ── RENDER ────────────────────────────────────────────────
+function render(name, d, ct) {
+  const hasSecs = d.sections && d.sections.length > 0;
+  const totalLinks = Object.values(d.links || {}).reduce(function(a,v){ return a+v.length; }, 0);
+
+  var h = '<div class="ctitle">' + esc(name) + '</div>';
+  h += '<div class="csub">UNESCO 2021 Recommendation on Open Science — Survey Response</div>';
+
+  if (d.indicators && Object.keys(d.indicators).length) {
+    h += '<div class="indicators">';
+    Object.entries(d.indicators).forEach(function(kv) {
+      h += '<div class="ind-card"><div class="ind-lbl">' + esc(kv[0]) + '</div><div class="ind-val">' + esc(kv[1]) + '</div></div>';
+    });
+    h += '</div>';
+  }
+
+  if (!hasSecs) {
+    h += '<div class="no-data">No detailed survey responses were recorded for this country in the dataset.</div>';
+  } else {
+    h += '<div class="sec-nav">';
+    d.sections.forEach(function(s) {
+      var id = getSid(s.title); var c = COLORS[id] || '#fff';
+      h += '<button class="sec-tab" style="border-color:' + c + '44;color:' + c + '" data-goto="sec-' + id + '">' + id + '</button>';
+    });
+    if (totalLinks > 0) h += '<button class="sec-tab" data-goto="sec-lnk">Links ↗</button>';
+    h += '</div>';
+
+    d.sections.forEach(function(s) {
+      var id = getSid(s.title); var c = COLORS[id] || '#7fffb2';
+      var ttl = s.title.replace(/^B\d+\s*[–-]\s*/, '');
+      h += '<div class="sec-block" id="sec-' + id + '"><div class="sec-hdr" data-toggle="section"><span class="sec-id" style="color:' + c + ';background:' + c + '1a">' + id + '</span><span class="sec-ttl">' + esc(ttl) + '</span><span class="chevron">▾</span></div><div class="sec-body">';
+      s.questions.forEach(function(q) {
+        h += '<div class="q-block"><div class="q-lbl"><span class="qid">' + esc(q.id) + '</span><span class="q-q">' + esc(q.q) + '</span></div><div class="q-a">' + esc(q.text) + '</div></div>';
+      });
+      h += '</div></div>';
+    });
+  }
+
+  if (totalLinks > 0) {
+    h += '<div class="links-block" id="sec-lnk"><div class="links-hdr" data-toggle="links"><span class="sec-id" style="color:#9090b0;background:#9090b01a">↗</span><span class="sec-ttl">Links</span><span class="links-badge">' + totalLinks + ' URLs</span><span class="chevron">▾</span></div><div class="links-body">';
+    Object.entries(d.links).forEach(function(kv) {
+      if (!kv[1].length) return;
+      h += '<div class="lg-title">' + esc(kv[0]) + '</div>';
+      kv[1].forEach(function(it) {
+        h += '<div class="litem"><span class="lqid">' + esc(it.qid) + '</span><a class="lurl" href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.url) + '</a></div>';
+      });
+    });
+    h += '</div></div>';
+  }
+
+  ct.innerHTML = h;
+  ct.scrollTop = 0;
+}
+
+// ── INTERACTIONS ──────────────────────────────────────────
+document.getElementById('content').addEventListener('click', function(e) {
+  var hdr = e.target.closest('[data-toggle="section"]');
+  if (hdr) { hdr.closest('.sec-block').classList.toggle('collapsed'); return; }
+
+  var lhdr = e.target.closest('[data-toggle="links"]');
+  if (lhdr) {
+    var body = lhdr.closest('.links-block').querySelector('.links-body');
+    var chv = lhdr.querySelector('.chevron');
+    body.classList.toggle('hidden');
+    chv.style.transform = body.classList.contains('hidden') ? 'rotate(-90deg)' : '';
+    return;
+  }
+
+  var tab = e.target.closest('[data-goto]');
+  if (tab) {
+    var el = document.getElementById(tab.dataset.goto);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+});
+
+document.getElementById('search').addEventListener('input', function(e) { buildSidebar(e.target.value); });
+
+// ── UTILS ─────────────────────────────────────────────────
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function getSid(t) { var m = t.match(/^(B\d+)/); return m ? m[1] : 'B1'; }
+
+buildSidebar();
+</script>
+</body>
+</html>
