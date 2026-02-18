@@ -1,0 +1,2 @@
+- [Quanti dashboard](https://claude.ai/public/artifacts/11082da4-719f-4f62-a595-f5a343ffa4c8)
+- [Quali data visualizer](https://thessaly.github.io/data-viz)
