@@ -396,6 +396,32 @@ svg#radar-chart { overflow: visible; }
 .pill-arab { background: rgba(167,139,250,0.15); color: var(--r-arab); }
 .pill-latam { background: rgba(248,113,113,0.15); color: var(--r-latam); }
 
+
+/* ── MULTI-OPTION VIZ ── */
+.mo-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-top: 20px; }
+.mo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.mo-opt-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.mo-opt-label { font-size: 11px; color: var(--text2); flex: 1; line-height: 1.4; }
+.mo-bar-track { width: 180px; height: 10px; background: var(--bg4); border-radius: 5px; overflow: hidden; flex-shrink: 0; }
+.mo-bar-fill { height: 100%; border-radius: 5px; transition: width 0.5s ease; }
+.mo-bar-n { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); min-width: 50px; text-align: right; }
+.mo-combo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px; margin-top: 12px; }
+.mo-combo-row { background: var(--bg3); border-radius: 6px; padding: 8px 10px; display: flex; align-items: center; gap: 8px; }
+.mo-combo-dots { display: flex; gap: 3px; }
+.mo-dot { width: 12px; height: 12px; border-radius: 3px; }
+.mo-dot-on { background: var(--teal); }
+.mo-dot-off { background: var(--bg4); border: 1px solid rgba(255,255,255,0.07); }
+.mo-combo-count { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--gold); margin-left: auto; }
+.mo-upset-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; cursor: pointer; }
+.mo-upset-row:hover .mo-upset-bar-fill { filter: brightness(1.2); }
+.mo-upset-bar-track { flex: 1; height: 16px; background: var(--bg4); border-radius: 4px; overflow: hidden; }
+.mo-upset-bar-fill { height: 100%; border-radius: 4px; background: var(--teal); opacity: 0.85; transition: width 0.4s ease; }
+.mo-upset-n { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); min-width: 28px; text-align: right; }
+.mo-region-block { margin-bottom: 6px; }
+.mo-region-optbars { display: flex; flex-direction: column; gap: 4px; margin-top: 4px; padding-left: 8px; }
+.mo-heatrow { display: flex; gap: 3px; align-items: center; margin-bottom: 3px; }
+.mo-heatcell { width: 14px; height: 14px; border-radius: 2px; }
+
 /* ── TOOLTIP ── */
 #tooltip {
   position: fixed; background: var(--bg3); border: 1px solid var(--border2);
@@ -407,6 +433,38 @@ svg#radar-chart { overflow: visible; }
 #tooltip .tt-q { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); margin-bottom: 4px; }
 #tooltip .tt-country { font-weight: 600; margin-bottom: 4px; }
 #tooltip .tt-val { }
+
+/* ── B3.4 INFRA VIZ ── */
+.b34-opts-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 24px; }
+.b34-opt-card {
+  background: var(--bg3); border-radius: 8px; padding: 16px;
+  border: 1px solid var(--border); position: relative; overflow: hidden;
+}
+.b34-opt-letter {
+  font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--gold);
+  opacity: 0.15; position: absolute; top: 8px; right: 12px; line-height: 1;
+}
+.b34-opt-label { font-size: 11px; color: var(--text2); line-height: 1.5; margin-bottom: 12px; min-height: 50px; }
+.b34-opt-count { font-family: 'DM Serif Display', serif; font-size: 28px; color: var(--teal); }
+.b34-opt-pct { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); }
+.b34-opt-bar { height: 4px; background: var(--bg4); border-radius: 2px; margin-top: 8px; }
+.b34-opt-bar-fill { height: 100%; border-radius: 2px; background: var(--teal); }
+
+.b34-combo-grid { display: grid; grid-template-columns: auto 1fr auto; gap: 8px 12px; align-items: center; }
+.b34-combo-dots { display: flex; gap: 4px; }
+.b34-combo-dot { width: 12px; height: 12px; border-radius: 3px; }
+.b34-combo-bar-track { height: 8px; background: var(--bg4); border-radius: 4px; overflow: hidden; }
+.b34-combo-bar-fill { height: 100%; border-radius: 4px; background: var(--gold); opacity: 0.7; }
+.b34-combo-count { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); text-align: right; }
+
+.b34-region-grid { display: grid; grid-template-columns: 140px repeat(4,1fr); gap: 6px 10px; align-items: center; }
+.b34-region-hd { font-family: 'DM Mono', monospace; font-size: 9px; color: var(--text3); text-align: center; letter-spacing: 0.08em; }
+.b34-region-cell { text-align: center; }
+.b34-region-bubble {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%; font-family: 'DM Mono', monospace;
+  font-size: 11px; font-weight: 500; margin: 0 auto;
+}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -472,7 +530,25 @@ svg#radar-chart { overflow: visible; }
     </div>
     <div class="q-overview-grid" id="q-overview-grid"></div>
   </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="card-title">B3.4 — Open Science Infrastructure Types Selected</div>
+    <div id="b34-overview"></div>
+  </div>
 </div>
+
+
+  <!-- B2.1 + B3.4 multi-option cards -->
+  <div class="grid2" style="margin-top:20px" id="mo-cards-row">
+    <div class="mo-card">
+      <div class="card-title">B2.1 — Which Open Science Elements in National STI Policy?</div>
+      <div id="mo-b21-body"></div>
+    </div>
+    <div class="mo-card">
+      <div class="card-title">B3.4 — Which Infrastructure Types Are Present?</div>
+      <div id="mo-b34-body"></div>
+    </div>
+  </div>
 
 <!-- ═══════════════════════════════════════
      VIEW 2 — HEATMAP
@@ -690,6 +766,8 @@ function init() {
   buildCountrySelect();
   buildRankings();
   buildQuestionList();
+  buildMultiOptionViz('B2.1', document.getElementById('mo-b21-body'));
+  buildMultiOptionViz('B3.4', document.getElementById('mo-b34-body'));
 }
 
 // ═══════════════════════════════════════
@@ -1224,6 +1302,23 @@ function selectQuestion(q) {
 
   detail += '</div>';
   document.getElementById('q-detail').innerHTML = detail;
+
+  // For multi-option questions, append a breakdown panel
+  if (q === 'B3.4' || q === 'B2.1') {
+    const titles = {
+      'B2.1': 'B2.1 — Which Open Science Elements in National STI Policy?',
+      'B3.4': 'B3.4 — Which Infrastructure Types Are Present?',
+    };
+    const extra = document.createElement('div');
+    extra.className = 'mo-card';
+    extra.style.marginTop = '16px';
+    const innerDiv = document.createElement('div');
+    innerDiv.id = 'mo-inline-body';
+    extra.innerHTML = '<div class="card-title">' + titles[q] + '</div>';
+    extra.appendChild(innerDiv);
+    document.getElementById('q-detail').appendChild(extra);
+    buildMultiOptionViz(q, innerDiv);
+  }
 }
 
 function buildDonut(counts, total) {
@@ -1251,6 +1346,129 @@ function buildDonut(counts, total) {
     <text x="70" y="66" text-anchor="middle" font-family="DM Serif Display,serif" font-size="22" fill="var(--gold)">${pctY}%</text>
     <text x="70" y="80" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text3)">YES</text>
   </svg>`;
+}
+
+// ═══════════════════════════════════════
+// B3.4 INFRASTRUCTURE VIZ
+// ═══════════════════════════════════════
+const B34_OPTS = [
+  { key: 'B3.4 optA', letter: 'A', label: 'Federated IT infrastructure for OS, incl. HPC, cloud computing & data storage', color: '#2dd4bf' },
+  { key: 'B3.4 optB', letter: 'B', label: 'Community managed infrastructures, protocols & standards (incl. bibliodiversity)', color: '#60a5fa' },
+  { key: 'B3.4 optC', letter: 'C', label: 'Platforms for exchanges & co-creation of knowledge between scientists & society', color: '#a78bfa' },
+  { key: 'B3.4 optD', letter: 'D', label: 'Community-based monitoring & information systems complementing national/global data systems', color: '#fbbf24' },
+];
+
+
+
+// ═══════════════════════════════════════
+// MULTI-OPTION VIZ (B2.1 / B3.4)
+// ═══════════════════════════════════════
+const MO_DEFS = {
+  'B2.1': {
+    opts: ['A','B','C','D'],
+    opt_colors: ['#60a5fa','#a78bfa','#34d399','#fbbf24'],
+    labels: [
+      'Open access to scientific knowledge',
+      'Open science infrastructure',
+      'Open engagement of societal actors',
+      'Open dialogue with other knowledge systems',
+    ],
+    sublabel: 'of countries with a national STI policy (B2.1 = Y)',
+  },
+  'B3.4': {
+    opts: ['A','B','C','D'],
+    opt_colors: ['#2dd4bf','#818cf8','#fb923c','#f472b6'],
+    labels: [
+      'HPC, cloud computing & data storage',
+      'Community-managed infra, protocols & standards',
+      'Platforms for knowledge co-creation with society',
+      'Community-based monitoring & information systems',
+    ],
+    sublabel: 'of all 82 respondents',
+  },
+};
+
+function buildMultiOptionViz(qbase, targetEl) {
+  const def = MO_DEFS[qbase];
+  if (!def) return;
+  const N = DATA.length;
+  const baseKey = qbase;
+
+  // Count each option
+  const optCounts = def.opts.map(o => DATA.filter(d => d[baseKey + ' opt' + o] === 'Y').length);
+  const maxCount = Math.max(...optCounts);
+
+  // Combination counts
+  const comboCounts = {};
+  DATA.forEach(d => {
+    const key = def.opts.map(o => d[baseKey + ' opt' + o] === 'Y' ? '1' : '0').join('');
+    comboCounts[key] = (comboCounts[key] || 0) + 1;
+  });
+  const combos = Object.entries(comboCounts)
+    .filter(([k]) => k !== '0000')
+    .sort((a, b) => b[1] - a[1]);
+
+  // Regional breakdown
+  const regions = ['Europe and North America','Asia and the Pacific','Arab States','Africa','Latin America and the Caribbean'];
+
+  let html = `
+  <!-- Opt bars -->
+  <div style="margin-bottom:18px">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:10px;letter-spacing:0.08em">SELECTION RATE — ${def.sublabel}</div>
+    ${def.opts.map((o, i) => `
+    <div class="mo-opt-row">
+      <div style="width:14px;height:14px;border-radius:3px;background:${def.opt_colors[i]};opacity:0.9;flex-shrink:0"></div>
+      <div class="mo-opt-label"><strong style="font-family:'DM Mono',monospace;font-size:10px;color:${def.opt_colors[i]}">opt${o}</strong>  ${def.labels[i]}</div>
+      <div class="mo-bar-track"><div class="mo-bar-fill" style="width:${optCounts[i]/N*100}%;background:${def.opt_colors[i]}"></div></div>
+      <div class="mo-bar-n">${optCounts[i]}/${N} <span style="color:var(--text3)">${Math.round(optCounts[i]/N*100)}%</span></div>
+    </div>`).join('')}
+  </div>
+
+  <!-- Combination upset-style chart -->
+  <div style="margin-bottom:18px">
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:10px;letter-spacing:0.08em">COMBINATIONS SELECTED</div>
+    <div style="display:grid;grid-template-columns:80px 1fr 28px;gap:6px;align-items:center;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid var(--border)">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--text3)">A  B  C  D</div>
+      <div></div><div></div>
+    </div>
+    ${combos.slice(0,10).map(([key, count]) => {
+      const bits = key.split('');
+      const dots = bits.map((b,i) => `<div class="mo-dot ${b==='1'?'mo-dot-on':'mo-dot-off'}" style="${b==='1'?'background:'+def.opt_colors[i]:''}" title="opt${def.opts[i]}"></div>`).join('');
+      const w = Math.round(count / Math.max(...combos.map(c=>c[1])) * 100);
+      const activeColors = bits.map((b,i) => b==='1' ? def.opt_colors[i] : null).filter(Boolean);
+      const barColor = activeColors.length === 1 ? activeColors[0] : 'var(--teal)';
+      return `<div style="display:grid;grid-template-columns:80px 1fr 28px;gap:6px;align-items:center;margin-bottom:5px">
+        <div class="mo-combo-dots">${dots}</div>
+        <div class="mo-upset-bar-track"><div class="mo-upset-bar-fill" style="width:${w}%;background:${barColor}"></div></div>
+        <div class="mo-upset-n">${count}</div>
+      </div>`;
+    }).join('')}
+  </div>
+
+  <!-- Regional breakdown -->
+  <div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:10px;letter-spacing:0.08em">BY REGION</div>
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center">
+      ${regions.map(r => {
+        const rc = DATA.filter(d => d.region === r);
+        const rcls = regionClass(r);
+        const segWidths = def.opts.map((o,i) => ({
+          w: rc.filter(d => d[baseKey+' opt'+o] === 'Y').length / rc.length * 100,
+          color: def.opt_colors[i],
+          n: rc.filter(d => d[baseKey+' opt'+o] === 'Y').length,
+        }));
+        return `<div class="r-${rcls}" style="font-size:11px;white-space:nowrap">${REGION_SHORT[r]||r}</div>
+          <div style="display:flex;gap:3px;align-items:center">
+            ${segWidths.map(s => `<div title="${Math.round(s.w)}% (${s.n}/${rc.length})" style="height:12px;width:${Math.max(s.w,0)}%;background:${s.color};border-radius:2px;opacity:0.85;min-width:${s.n>0?2:0}px"></div>`).join('')}
+          </div>`;
+      }).join('')}
+    </div>
+    <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap">
+      ${def.opts.map((o,i) => `<div style="display:flex;align-items:center;gap:4px;font-size:10px;font-family:'DM Mono',monospace;color:var(--text2)"><div style="width:10px;height:10px;border-radius:2px;background:${def.opt_colors[i]}"></div>opt${o}</div>`).join('')}
+    </div>
+  </div>`;
+
+  targetEl.innerHTML = html;
 }
 
 // ═══════════════════════════════════════
