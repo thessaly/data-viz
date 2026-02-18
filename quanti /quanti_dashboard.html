@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNESCO Open Science Survey — Quantitative Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg2: #111827;
+  --bg3: #1a2235;
+  --bg4: #1f2d45;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8edf5;
+  --text2: #8fa3be;
+  --text3: #4d6480;
+  --gold: #f5c842;
+  --gold2: #e8a020;
+  --teal: #2dd4bf;
+  --blue: #60a5fa;
+  --rose: #f87171;
+  --amber: #fbbf24;
+  --green: #34d399;
+  --Y: #2dd4bf;
+  --P: #fbbf24;
+  --U: #818cf8;
+  --N: #f87171;
+  --null: #1f2d45;
+  --r-europe: #60a5fa;
+  --r-africa: #34d399;
+  --r-asia: #f59e0b;
+  --r-arab: #a78bfa;
+  --r-latam: #f87171;
+  --radius: 10px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(135deg, #0d1525 0%, #0a1a2e 50%, #0d1520 100%);
+  border-bottom: 1px solid var(--border2);
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: 60px;
+}
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 17px;
+  color: var(--gold);
+  white-space: nowrap;
+  letter-spacing: -0.3px;
+}
+.logo span { color: var(--text2); font-style: italic; }
+nav { display: flex; gap: 4px; margin-left: auto; }
+.nav-btn {
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-transform: uppercase;
+}
+.nav-btn:hover { background: var(--bg3); color: var(--text); }
+.nav-btn.active { background: var(--bg4); color: var(--gold); }
+.header-stats {
+  display: flex; gap: 24px;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; color: var(--text3);
+}
+.header-stat strong { color: var(--teal); }
+
+/* ── VIEWS ── */
+.view { display: none; padding: 28px 32px; animation: fadeIn 0.25s ease; }
+.view.active { display: block; }
+@keyframes fadeIn { from { opacity:0; transform:translateY(4px) } to { opacity:1; transform:none } }
+
+/* ── GRID UTILS ── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.card-title {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 14px;
+}
+.stat-big {
+  font-family: 'DM Serif Display', serif;
+  font-size: 42px;
+  color: var(--gold);
+  line-height: 1;
+}
+.stat-label { color: var(--text2); font-size: 12px; margin-top: 4px; }
+
+/* ── SECTION TITLE ── */
+.section-hd {
+  margin-bottom: 20px;
+  display: flex; align-items: baseline; gap: 12px;
+}
+.section-hd h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: 22px; font-weight: 400;
+}
+.section-hd .sub { color: var(--text3); font-size: 12px; font-family: 'DM Mono', monospace; }
+
+/* ── RESPONSE BADGES ── */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px; border-radius: 4px;
+  font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+  line-height: 1.6;
+}
+.badge-Y { background: rgba(45,212,191,0.15); color: var(--Y); }
+.badge-P { background: rgba(251,191,36,0.15); color: var(--P); }
+.badge-U { background: rgba(129,140,248,0.15); color: var(--U); }
+.badge-N { background: rgba(248,113,113,0.15); color: var(--N); }
+.badge-null { background: var(--bg4); color: var(--text3); }
+
+/* ── LEGEND ── */
+.legend { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; font-family: 'DM Mono', monospace; color: var(--text2); }
+.legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+/* ──────────────────────────────────────────
+   VIEW 1 — OVERVIEW
+──────────────────────────────────────────── */
+.kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px; }
+.kpi-card {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 18px; text-align: center;
+}
+.kpi-n { font-family: 'DM Serif Display', serif; font-size: 36px; color: var(--gold); }
+.kpi-label { font-size: 11px; color: var(--text2); margin-top: 2px; font-family: 'DM Mono', monospace; line-height: 1.4; }
+
+.overview-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 20px; margin-bottom: 20px; }
+.region-bars-wrap { display: flex; flex-direction: column; gap: 0; }
+
+.reg-bar-row {
+  display: grid; grid-template-columns: 150px 1fr 36px;
+  align-items: center; gap: 12px; padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+.reg-bar-row:last-child { border-bottom: none; }
+.reg-name { font-size: 12px; color: var(--text2); }
+.reg-track { background: var(--bg4); border-radius: 3px; height: 8px; overflow: hidden; }
+.reg-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+.reg-pct { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); text-align: right; }
+
+.q-overview-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.q-overview-row {
+  background: var(--bg3); border-radius: 8px; padding: 12px 14px;
+  cursor: pointer; transition: background 0.15s;
+}
+.q-overview-row:hover { background: var(--bg4); }
+.q-overview-id { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); margin-bottom: 4px; }
+.q-overview-text { font-size: 11px; color: var(--text2); margin-bottom: 10px; line-height: 1.4; }
+.q-stacked { display: flex; height: 6px; border-radius: 3px; overflow: hidden; gap: 1px; }
+.q-stacked-seg { height: 100%; transition: width 0.4s ease; }
+.q-pct-row { display: flex; justify-content: space-between; margin-top: 6px; }
+.q-pct-item { font-family: 'DM Mono', monospace; font-size: 9px; }
+
+/* ──────────────────────────────────────────
+   VIEW 2 — HEATMAP
+──────────────────────────────────────────── */
+.heatmap-controls {
+  display: flex; gap: 12px; align-items: center; margin-bottom: 16px; flex-wrap: wrap;
+}
+.heatmap-controls select, .heatmap-controls input {
+  background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px;
+  color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px;
+  padding: 6px 10px; cursor: pointer; outline: none;
+}
+.heatmap-controls input { width: 200px; }
+
+.heatmap-wrap { overflow: auto; border-radius: var(--radius); background: var(--bg2); border: 1px solid var(--border); }
+#heatmap-table { border-collapse: collapse; font-family: 'DM Mono', monospace; font-size: 11px; }
+#heatmap-table th {
+  background: var(--bg3); color: var(--text2); font-weight: 400;
+  padding: 0; text-align: center; position: sticky; top: 0; z-index: 10;
+}
+#heatmap-table th.col-hd {
+  writing-mode: vertical-rl; text-orientation: mixed;
+  transform: rotate(180deg); padding: 8px 4px; min-width: 26px; max-width: 26px;
+  font-size: 10px; cursor: pointer; white-space: nowrap; max-height: 140px;
+}
+#heatmap-table th.col-hd:hover { background: var(--bg4); color: var(--gold); }
+#heatmap-table th.row-corner {
+  width: 160px; min-width: 160px; text-align: left; padding: 8px 12px;
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+}
+#heatmap-table td {
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 0; text-align: center; cursor: pointer;
+}
+#heatmap-table td.country-cell {
+  padding: 5px 12px; text-align: left; font-size: 11px;
+  color: var(--text2); background: var(--bg3); min-width: 160px;
+  position: sticky; left: 0; z-index: 5; white-space: nowrap;
+  border-right: 1px solid var(--border2);
+  cursor: pointer;
+}
+#heatmap-table td.country-cell:hover { color: var(--gold); }
+#heatmap-table td.country-cell .score-pill {
+  display: inline-block; margin-left: 6px;
+  font-size: 9px; color: var(--text3);
+}
+#heatmap-table tr:hover td.country-cell { color: var(--gold); }
+.hm-cell {
+  width: 24px; height: 28px; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 500; transition: transform 0.1s;
+}
+.hm-cell:hover { transform: scale(1.4); z-index: 20; position: relative; }
+.cell-Y { background: rgba(45,212,191,0.25); color: var(--Y); }
+.cell-P { background: rgba(251,191,36,0.2); color: var(--P); }
+.cell-U { background: rgba(129,140,248,0.2); color: var(--U); }
+.cell-N { background: rgba(248,113,113,0.15); color: var(--N); }
+.cell-null { background: transparent; color: var(--text3); }
+.heatmap-section-hd { background: var(--bg) !important; color: var(--text3) !important; font-size: 9px; letter-spacing: 0.15em; }
+
+/* ──────────────────────────────────────────
+   VIEW 3 — COUNTRY DEEP-DIVE
+──────────────────────────────────────────── */
+.country-select-row {
+  display: flex; gap: 12px; align-items: center; margin-bottom: 24px;
+}
+.country-select-row select {
+  background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px;
+  color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+  padding: 8px 14px; cursor: pointer; outline: none; min-width: 240px;
+}
+.country-header-card {
+  background: linear-gradient(135deg, var(--bg3), var(--bg2));
+  border: 1px solid var(--border2); border-radius: var(--radius);
+  padding: 20px 24px; margin-bottom: 20px;
+  display: grid; grid-template-columns: auto 1fr auto;
+  gap: 20px; align-items: center;
+}
+.country-flag { font-size: 40px; }
+.country-name { font-family: 'DM Serif Display', serif; font-size: 26px; margin-bottom: 4px; }
+.country-meta { color: var(--text2); font-size: 12px; }
+.country-score-big {
+  font-family: 'DM Serif Display', serif; font-size: 52px; color: var(--gold); text-align: center;
+}
+.country-score-label { font-size: 11px; color: var(--text3); font-family: 'DM Mono', monospace; text-align: center; }
+
+.country-grid { display: grid; grid-template-columns: 1.1fr 1fr; gap: 20px; }
+
+.radar-wrap { display: flex; justify-content: center; padding: 10px; }
+svg#radar-chart { overflow: visible; }
+
+.section-detail { }
+.sec-block { margin-bottom: 8px; }
+.sec-block-hd {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; background: var(--bg3); border-radius: 6px;
+  cursor: pointer; transition: background 0.15s;
+}
+.sec-block-hd:hover { background: var(--bg4); }
+.sec-block-title { font-size: 12px; font-weight: 500; }
+.sec-block-score { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--gold); }
+.sec-block-body { padding: 4px 0; display: none; }
+.sec-block-body.open { display: block; }
+.q-row {
+  display: flex; align-items: flex-start; gap: 10px; padding: 6px 12px;
+  border-bottom: 1px solid var(--border); font-size: 12px;
+}
+.q-row:last-child { border-bottom: none; }
+.q-id { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); min-width: 40px; margin-top: 2px; }
+.q-text { flex: 1; color: var(--text2); line-height: 1.5; }
+.q-val { flex-shrink: 0; margin-top: 1px; }
+
+/* ──────────────────────────────────────────
+   VIEW 4 — RANKINGS
+──────────────────────────────────────────── */
+.rankings-controls {
+  display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; align-items: center;
+}
+.rankings-controls select {
+  background: var(--bg3); border: 1px solid var(--border2); border-radius: 6px;
+  color: var(--text); font-family: 'DM Mono', monospace; font-size: 12px;
+  padding: 6px 12px; cursor: pointer; outline: none;
+}
+.filter-tag {
+  background: var(--bg3); border: 1px solid var(--border2); border-radius: 20px;
+  color: var(--text2); font-family: 'DM Mono', monospace; font-size: 11px;
+  padding: 4px 12px; cursor: pointer; transition: all 0.15s;
+}
+.filter-tag:hover, .filter-tag.active {
+  background: var(--bg4); border-color: var(--gold); color: var(--gold);
+}
+
+.ranking-list { display: flex; flex-direction: column; gap: 4px; }
+.rank-row {
+  display: grid; align-items: center;
+  grid-template-columns: 36px 160px 1fr 60px 90px;
+  gap: 12px; padding: 8px 14px; background: var(--bg2);
+  border: 1px solid var(--border); border-radius: 8px;
+  cursor: pointer; transition: all 0.15s;
+}
+.rank-row:hover { background: var(--bg3); border-color: var(--border2); }
+.rank-num { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); text-align: right; }
+.rank-country { font-size: 13px; font-weight: 500; }
+.rank-bar-wrap { height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+.rank-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+.rank-score { font-family: 'DM Serif Display', serif; font-size: 18px; color: var(--gold); text-align: right; }
+.rank-region {
+  font-family: 'DM Mono', monospace; font-size: 9px; padding: 3px 8px;
+  border-radius: 10px; text-align: center; white-space: nowrap;
+}
+
+/* ──────────────────────────────────────────
+   VIEW 5 — QUESTION EXPLORER
+──────────────────────────────────────────── */
+.q-explorer-layout { display: grid; grid-template-columns: 260px 1fr; gap: 20px; }
+.q-list { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.q-list-item {
+  padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+}
+.q-list-item:last-child { border-bottom: none; }
+.q-list-item:hover { background: var(--bg3); }
+.q-list-item.active { background: var(--bg4); border-left: 3px solid var(--gold); }
+.q-list-id { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); }
+.q-list-text { font-size: 11px; color: var(--text2); margin-top: 2px; line-height: 1.4; }
+.q-detail-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
+.q-detail-title { font-family: 'DM Serif Display', serif; font-size: 18px; margin-bottom: 6px; line-height: 1.4; }
+.q-detail-id { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); margin-bottom: 20px; }
+.q-donut-row { display: grid; grid-template-columns: 160px 1fr; gap: 24px; align-items: center; margin-bottom: 20px; }
+.q-result-bars { display: flex; flex-direction: column; gap: 8px; }
+.q-res-row { display: grid; grid-template-columns: 20px 140px 1fr 36px; gap: 8px; align-items: center; }
+.q-res-val { font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; }
+.q-res-label { font-size: 11px; color: var(--text2); }
+.q-res-bar-track { height: 8px; background: var(--bg4); border-radius: 4px; overflow: hidden; }
+.q-res-bar-fill { height: 100%; border-radius: 4px; }
+.q-res-count { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text2); text-align: right; }
+
+.q-country-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px;
+  margin-top: 16px; max-height: 300px; overflow-y: auto;
+}
+.q-country-chip {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 10px; border-radius: 6px; font-size: 11px;
+  background: var(--bg3); border: 1px solid var(--border); cursor: pointer;
+}
+.q-country-chip:hover { border-color: var(--border2); }
+
+/* ── REGION COLORS ── */
+.r-europe { color: var(--r-europe); }
+.r-africa { color: var(--r-africa); }
+.r-asia { color: var(--r-asia); }
+.r-arab { color: var(--r-arab); }
+.r-latam { color: var(--r-latam); }
+.bg-europe { background: var(--r-europe); }
+.bg-africa { background: var(--r-africa); }
+.bg-asia { background: var(--r-asia); }
+.bg-arab { background: var(--r-arab); }
+.bg-latam { background: var(--r-latam); }
+.pill-europe { background: rgba(96,165,250,0.15); color: var(--r-europe); }
+.pill-africa { background: rgba(52,211,153,0.15); color: var(--r-africa); }
+.pill-asia { background: rgba(245,158,11,0.15); color: var(--r-asia); }
+.pill-arab { background: rgba(167,139,250,0.15); color: var(--r-arab); }
+.pill-latam { background: rgba(248,113,113,0.15); color: var(--r-latam); }
+
+/* ── TOOLTIP ── */
+#tooltip {
+  position: fixed; background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 8px; padding: 10px 14px; font-size: 12px; pointer-events: none;
+  opacity: 0; transition: opacity 0.15s; z-index: 1000; max-width: 280px;
+  box-shadow: var(--shadow);
+}
+#tooltip.show { opacity: 1; }
+#tooltip .tt-q { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text3); margin-bottom: 4px; }
+#tooltip .tt-country { font-weight: 600; margin-bottom: 4px; }
+#tooltip .tt-val { }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text3); }
+</style>
+</head>
+<body>
+
+<div id="tooltip">
+  <div class="tt-q" id="tt-q"></div>
+  <div class="tt-country" id="tt-country"></div>
+  <div class="tt-val" id="tt-val"></div>
+</div>
+
+<header>
+  <div class="logo">UNESCO Open Science <span>2025 Survey</span></div>
+  <div class="header-stats">
+    <div>Countries <strong>82</strong></div>
+    <div>Questions <strong>30</strong></div>
+    <div>Respondents <strong>82</strong></div>
+  </div>
+  <nav>
+    <button class="nav-btn active" onclick="showView('overview', this)">Overview</button>
+    <button class="nav-btn" onclick="showView('heatmap', this)">Heatmap</button>
+    <button class="nav-btn" onclick="showView('country', this)">Country</button>
+    <button class="nav-btn" onclick="showView('rankings', this)">Rankings</button>
+    <button class="nav-btn" onclick="showView('questions', this)">Questions</button>
+  </nav>
+</header>
+
+<!-- ═══════════════════════════════════════
+     VIEW 1 — OVERVIEW
+═══════════════════════════════════════ -->
+<div class="view active" id="view-overview">
+  <div class="section-hd">
+    <h2>Global Overview</h2>
+    <span class="sub">82 countries · 30 core indicators · 5 regions</span>
+  </div>
+
+  <div class="kpi-row" id="kpi-row"></div>
+
+  <div class="overview-grid">
+    <div class="card">
+      <div class="card-title">Average Score by Region</div>
+      <div id="region-bars" class="region-bars-wrap"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Score Distribution</div>
+      <canvas id="dist-canvas" width="340" height="200"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Response Overview — All Questions</div>
+    <div class="legend" style="margin-bottom:12px">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--Y)"></div> Yes / Full</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--P)"></div> Partial</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--U)"></div> Under dev.</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--N)"></div> No</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--bg4)"></div> No data</div>
+    </div>
+    <div class="q-overview-grid" id="q-overview-grid"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     VIEW 2 — HEATMAP
+═══════════════════════════════════════ -->
+<div class="view" id="view-heatmap">
+  <div class="section-hd">
+    <h2>Response Heatmap</h2>
+    <span class="sub">All countries × all questions</span>
+  </div>
+  <div class="heatmap-controls">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--Y)"></div> Y</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--P)"></div> P</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--U)"></div> U</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--N)"></div> N</div>
+    </div>
+    <select id="hm-region-filter" onchange="buildHeatmap()">
+      <option value="">All regions</option>
+      <option>Europe and North America</option>
+      <option>Africa</option>
+      <option>Asia and the Pacific</option>
+      <option>Arab States</option>
+      <option>Latin America and the Caribbean</option>
+    </select>
+    <select id="hm-sort" onchange="buildHeatmap()">
+      <option value="score">Sort by score ↓</option>
+      <option value="alpha">Sort alphabetically</option>
+      <option value="region">Sort by region</option>
+    </select>
+    <input type="text" id="hm-search" placeholder="Search country…" oninput="buildHeatmap()">
+  </div>
+  <div class="heatmap-wrap">
+    <table id="heatmap-table"></table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     VIEW 3 — COUNTRY
+═══════════════════════════════════════ -->
+<div class="view" id="view-country">
+  <div class="country-select-row">
+    <select id="country-select" onchange="loadCountry(this.value)"></select>
+    <div style="color:var(--text3); font-size:12px; font-family:'DM Mono',monospace;">← select a country to explore</div>
+  </div>
+  <div id="country-content"></div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     VIEW 4 — RANKINGS
+═══════════════════════════════════════ -->
+<div class="view" id="view-rankings">
+  <div class="section-hd">
+    <h2>Country Rankings</h2>
+    <span class="sub">Scored across all binary indicators (Y=100%, P/U=50%, N=0%)</span>
+  </div>
+  <div class="rankings-controls">
+    <select id="rank-region" onchange="buildRankings()">
+      <option value="">All regions</option>
+      <option>Europe and North America</option>
+      <option>Africa</option>
+      <option>Asia and the Pacific</option>
+      <option>Arab States</option>
+      <option>Latin America and the Caribbean</option>
+    </select>
+    <select id="rank-section" onchange="buildRankings()">
+      <option value="">Overall score</option>
+      <option value="B1 Promotion">B1 — Promotion</option>
+      <option value="B2 Policy">B2 — Policy & Governance</option>
+      <option value="B3 Infrastructure">B3 — Infrastructure</option>
+      <option value="B4 Capacity">B4 — Capacity Building</option>
+      <option value="B5 Assessment">B5 — Research Assessment</option>
+      <option value="B6 Engagement">B6 — Societal Engagement</option>
+      <option value="B7 Cooperation">B7 — International Cooperation</option>
+    </select>
+  </div>
+  <div class="ranking-list" id="ranking-list"></div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     VIEW 5 — QUESTIONS
+═══════════════════════════════════════ -->
+<div class="view" id="view-questions">
+  <div class="section-hd">
+    <h2>Question Explorer</h2>
+    <span class="sub">Click any question to see all country responses</span>
+  </div>
+  <div class="q-explorer-layout">
+    <div class="q-list" id="q-list"></div>
+    <div id="q-detail"></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════
+const QUESTIONS = {
+  'B1.1': 'Recommendation promoted to ministries & institutions',
+  'B1.2': 'Recommendation available in national language(s)',
+  'B1.3': 'Awareness-raising activities organised / foreseen by 2025',
+  'B1.4': 'Specific actions to incorporate open science values',
+  'B2.1': 'National STI policy exists',
+  'B2.1 optA': '↳ Includes: open access to scientific knowledge',
+  'B2.1 optB': '↳ Includes: open science infrastructure',
+  'B2.1 optC': '↳ Includes: open engagement of societal actors',
+  'B2.1 optD': '↳ Includes: open dialogue with other knowledge systems',
+  'B2.2': 'National OS policy / legal framework aligned with Recommendation',
+  'B2.3': 'Specific policy instruments promoting open science',
+  'B2.4': 'National implementation plan / roadmap for OS',
+  'B2.5': 'Institutional-level open science policies',
+  'B2.6': 'National funding mechanisms for open science',
+  'B2.7': 'OS practices integrated into research funding',
+  'B2.8': 'Public-private partnerships for open science',
+  'B2.9': 'National monitoring framework for open science',
+  'B3.3': 'National Research and Education Network (NREN) active',
+  'B3.4': 'National/institutional open science infrastructure exists',
+  'B3.4 optA': '↳ Includes: HPC / cloud / data storage',
+  'B3.4 optB': '↳ Includes: community-managed infrastructures',
+  'B3.4 optC': '↳ Includes: platforms for knowledge co-creation',
+  'B3.4 optD': '↳ Includes: community-based monitoring systems',
+  'B3.5': 'Country hosts/funds federated international OS infrastructure',
+  'B3.6': 'Involved in N-S, N-S-S, S-S infrastructure collaborations',
+  'B4.1': 'Systematic capacity building on OS in HE/research institutions',
+  'B4.2': 'Capacity building programmes for policymakers',
+  'B4.3': 'OS competencies in higher education curricula',
+  'B4.4': 'Open Educational Resources used for OS capacity building',
+  'B4.5': 'Science communication initiatives supporting OS',
+  'B5.1': 'Review of research assessment to align with OS principles',
+  'B5.2': 'OS practices incorporated in career evaluation systems',
+  'B5.3': 'Initiatives to recognise/reward OS practices',
+  'B5.4': 'Unintended negative consequences of OS reported',
+  'B6.1': 'Initiatives promoting participatory / open science practices',
+  'Q6.1 optA': '↳ Includes: promotion of pre-prints',
+  'Q6.1 optB': '↳ Includes: open peer-review practices',
+  'Q6.1 optC': '↳ Includes: sharing negative results & data',
+  'Q6.1 optD': '↳ Includes: citizen science / crowdsourcing',
+  'Q6.1 optE': '↳ Includes: participatory strategies for marginalised communities',
+  'Q6.1 optF': '↳ Includes: open innovation practices',
+  'Q6.1 optG': '↳ Includes: other practices',
+  'B7.2': 'Strategy/plan for cross-border multi-stakeholder OS collaboration',
+  'B7.3': 'Involved in discussions on international OS funding mechanisms',
+  'B8.1': 'External causes impeding OS implementation reported',
+};
+
+const CORE_QS = ['B1.1','B1.2','B1.3','B1.4','B2.1','B2.2','B2.3','B2.4','B2.5','B2.6','B2.7','B2.8','B2.9','B3.3','B3.4','B3.5','B3.6','B4.1','B4.2','B4.3','B4.4','B4.5','B5.1','B5.2','B5.3','B5.4','B6.1','B7.2','B7.3','B8.1'];
+
+const SECTIONS = {
+  'B1 Promotion':     { qs: ['B1.1','B1.2','B1.3','B1.4'], color: '#60a5fa' },
+  'B2 Policy':        { qs: ['B2.1','B2.2','B2.3','B2.4','B2.5','B2.6','B2.7','B2.8','B2.9'], color: '#a78bfa' },
+  'B3 Infrastructure':{ qs: ['B3.3','B3.4','B3.5','B3.6'], color: '#2dd4bf' },
+  'B4 Capacity':      { qs: ['B4.1','B4.2','B4.3','B4.4','B4.5'], color: '#fbbf24' },
+  'B5 Assessment':    { qs: ['B5.1','B5.2','B5.3','B5.4'], color: '#f87171' },
+  'B6 Engagement':    { qs: ['B6.1'], color: '#34d399' },
+  'B7 Cooperation':   { qs: ['B7.2','B7.3'], color: '#f59e0b' },
+};
+
+const REGION_COLORS = {
+  'Europe and North America': '#60a5fa',
+  'Africa': '#34d399',
+  'Asia and the Pacific': '#f59e0b',
+  'Arab States': '#a78bfa',
+  'Latin America and the Caribbean': '#f87171',
+};
+const REGION_CLASS = {
+  'Europe and North America': 'europe',
+  'Africa': 'africa',
+  'Asia and the Pacific': 'asia',
+  'Arab States': 'arab',
+  'Latin America and the Caribbean': 'latam',
+};
+const REGION_SHORT = {
+  'Europe and North America': 'Europe',
+  'Africa': 'Africa',
+  'Asia and the Pacific': 'Asia-Pac',
+  'Arab States': 'Arab States',
+  'Latin America and the Caribbean': 'Lat. Am.',
+};
+
+const VAL_LABELS = { 'Y':'Yes', 'P':'Partial', 'U':'Under dev.', 'N':'No', null:'No data' };
+const VAL_COLORS = { 'Y':'var(--Y)', 'P':'var(--P)', 'U':'var(--U)', 'N':'var(--N)', null:'var(--bg4)' };
+
+// ─── SCORE HELPERS ───
+function scoreVal(v) {
+  if (v === 'Y') return 1;
+  if (v === 'P' || v === 'U') return 0.5;
+  if (v === 'N') return 0;
+  if (v && v.toLowerCase().includes('both')) return 1;
+  if (v && v.toLowerCase().includes('national') && !v.toLowerCase().includes('institutional')) return 0.75;
+  if (v && v.toLowerCase().includes('institutional')) return 0.5;
+  if (v && v.toLowerCase() === 'no') return 0;
+  return null;
+}
+function sectionScore(country, secKey) {
+  const qs = SECTIONS[secKey].qs;
+  const scores = qs.map(q => scoreVal(country[q])).filter(s => s !== null);
+  return scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length*100) : 0;
+}
+function totalScore(country) {
+  const scores = CORE_QS.map(q => scoreVal(country[q])).filter(s => s !== null);
+  return scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length*100) : 0;
+}
+
+// ─── EMBED DATA ───
+const RAW_DATA = [{"country":"Saudi Arabia","region":"Arab States","iso2":"SA","lat":25.0,"lon":45.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":null,"B2.1 optB":"Y","B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"Y","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"Y","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":100,"B2 Policy":100,"B3 Infrastructure":100,"B4 Capacity":100,"B5 Assessment":100,"B6 Engagement":100,"B7 Cooperation":100},"total_score":100},{"country":"Thailand","region":"Asia and the Pacific","iso2":"TH","lat":15.0,"lon":100.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":null,"B2.9":null,"B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":null,"B3.6":null,"B4.1":"Y","B4.2":"Y","B4.3":"Y","B4.4":null,"B4.5":"Y","B5.1":null,"B5.2":null,"B5.3":null,"B5.4":null,"B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":"Y","Q6.1 optF":null,"Q6.1 optG":null,"B7.2":null,"B7.3":null,"B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":100,"B3 Infrastructure":100,"B4 Capacity":100,"B5 Assessment":0,"B6 Engagement":100,"B7 Cooperation":0},"total_score":100},{"country":"Tunisia","region":"Arab States","iso2":"TN","lat":34.0,"lon":9.0,"ldc":false,"A15":"Public;Civil Society;Private","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":null,"B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":null,"B2.3":null,"B2.4":null,"B2.5":null,"B2.6":null,"B2.7":null,"B2.8":null,"B2.9":null,"B3.3":"Y","B3.4":null,"B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":null,"B3.6":null,"B4.1":null,"B4.2":null,"B4.3":null,"B4.4":null,"B4.5":null,"B5.1":null,"B5.2":null,"B5.3":null,"B5.4":null,"B6.1":null,"Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":null,"B7.3":null,"B8.1":null,"section_scores":{"B1 Promotion":100,"B2 Policy":0,"B3 Infrastructure":100,"B4 Capacity":0,"B5 Assessment":0,"B6 Engagement":0,"B7 Cooperation":0},"total_score":100},{"country":"Canada","region":"Europe and North America","iso2":"CA","lat":60.0,"lon":-95.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"Y","B4.3":null,"B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":null,"Q6.1 optG":"Y","B7.2":"Y","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":100,"B2 Policy":100,"B3 Infrastructure":100,"B4 Capacity":100,"B5 Assessment":100,"B6 Engagement":100,"B7 Cooperation":50},"total_score":96},{"country":"China","region":"Asia and the Pacific","iso2":"CN","lat":35.0,"lon":105.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"Y","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"YES, at the national level","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":100,"B3 Infrastructure":100,"B4 Capacity":100,"B5 Assessment":75,"B6 Engagement":75,"B7 Cooperation":100},"total_score":96},{"country":"Netherlands","region":"Europe and North America","iso2":"NL","lat":52.5,"lon":5.75,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":null,"B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":0,"B2 Policy":100,"B3 Infrastructure":100,"B4 Capacity":75,"B5 Assessment":100,"B6 Engagement":100,"B7 Cooperation":100},"total_score":96},{"country":"Finland","region":"Europe and North America","iso2":"FI","lat":64.0,"lon":26.0,"ldc":false,"A15":"Public;Civil Society","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"U","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"N","B4.1":"Y","B4.2":"Y","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":null,"Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":94,"B3 Infrastructure":75,"B4 Capacity":100,"B5 Assessment":100,"B6 Engagement":100,"B7 Cooperation":100},"total_score":95},{"country":"South Africa","region":"Africa","iso2":"ZA","lat":-29.0,"lon":24.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"U","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"Y","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":100,"B2 Policy":100,"B3 Infrastructure":88,"B4 Capacity":100,"B5 Assessment":75,"B6 Engagement":100,"B7 Cooperation":100},"total_score":95},{"country":"Albania","region":"Europe and North America","iso2":"AL","lat":41.0,"lon":20.0,"ldc":false,"A15":"Public;Private","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"Y","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":"Y","Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":89,"B3 Infrastructure":100,"B4 Capacity":100,"B5 Assessment":75,"B6 Engagement":100,"B7 Cooperation":100},"total_score":93},{"country":"Austria","region":"Europe and North America","iso2":"AT","lat":47.3333,"lon":13.3333,"ldc":false,"A15":"Public;Civil Society","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"N","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":null,"B3.6":null,"B4.1":"Y","B4.2":null,"B4.3":"N","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":null,"B7.3":null,"B8.1":"Y","section_scores":{"B1 Promotion":100,"B2 Policy":89,"B3 Infrastructure":100,"B4 Capacity":75,"B5 Assessment":100,"B6 Engagement":100,"B7 Cooperation":0},"total_score":92},{"country":"Malaysia","region":"Asia and the Pacific","iso2":"MY","lat":2.5,"lon":112.5,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":null,"B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":"Y","B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"Y","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"Y","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"Y","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":0,"B2 Policy":100,"B3 Infrastructure":100,"B4 Capacity":100,"B5 Assessment":50,"B6 Engagement":100,"B7 Cooperation":100},"total_score":92},{"country":"Qatar","region":"Arab States","iso2":"QA","lat":25.5,"lon":51.25,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"U","B2.4":"U","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":null,"B5.2":"Y","B5.3":"Y","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"Y","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":100,"B2 Policy":78,"B3 Infrastructure":100,"B4 Capacity":80,"B5 Assessment":100,"B6 Engagement":100,"B7 Cooperation":100},"total_score":89},{"country":"Uzbekistan","region":"Asia and the Pacific","iso2":"UZ","lat":41.0,"lon":64.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":null,"B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":null,"B2.2":"P","B2.3":"U","B2.4":null,"B2.5":null,"B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"Y","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":null,"B5.2":"N","B5.3":"Y","B5.4":null,"B6.1":null,"Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":null,"B7.3":"Y","B8.1":null,"section_scores":{"B1 Promotion":75,"B2 Policy":86,"B3 Infrastructure":100,"B4 Capacity":100,"B5 Assessment":50,"B6 Engagement":0,"B7 Cooperation":100},"total_score":87},{"country":"Argentina","region":"Latin America and the Caribbean","iso2":"AR","lat":-34.0,"lon":-64.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"U","B3.3":"Y","B3.4":"U","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"N","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":94,"B3 Infrastructure":88,"B4 Capacity":80,"B5 Assessment":75,"B6 Engagement":100,"B7 Cooperation":50},"total_score":86},{"country":"Australia","region":"Asia and the Pacific","iso2":"AU","lat":-27.0,"lon":133.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"U","B2.4":"U","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"Y","B4.3":null,"B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"Y","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":null,"B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":78,"B3 Infrastructure":100,"B4 Capacity":100,"B5 Assessment":50,"B6 Engagement":100,"B7 Cooperation":100},"total_score":85},{"country":"Ireland","region":"Europe and North America","iso2":"IE","lat":53.0,"lon":-8.0,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":"Y","B2.1 optB":null,"B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":null,"B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"N","B4.1":"Y","B4.2":"Y","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"Y","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":0,"B2 Policy":94,"B3 Infrastructure":75,"B4 Capacity":100,"B5 Assessment":75,"B6 Engagement":100,"B7 Cooperation":50},"total_score":85},{"country":"Germany","region":"Europe and North America","iso2":"DE","lat":51.0,"lon":9.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"Y","B2.3":"Y","B2.4":"N","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"Y","B4.3":"N","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"Y","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"N","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":78,"B3 Infrastructure":100,"B4 Capacity":80,"B5 Assessment":75,"B6 Engagement":100,"B7 Cooperation":50},"total_score":83},{"country":"Portugal","region":"Europe and North America","iso2":"PT","lat":39.5,"lon":-8.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"N","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"N","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"N","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":72,"B3 Infrastructure":100,"B4 Capacity":80,"B5 Assessment":50,"B6 Engagement":100,"B7 Cooperation":100},"total_score":81},{"country":"Republic of Korea","region":"Asia and the Pacific","iso2":"KR","lat":37.0,"lon":127.5,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"Y","B2.4":"U","B2.5":"Y","B2.6":"N","B2.7":"Y","B2.8":"Y","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":null,"B4.3":null,"B4.4":"N","B4.5":null,"B5.1":null,"B5.2":null,"B5.3":"Y","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":"Y","Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":null,"B7.3":null,"B8.1":null,"section_scores":{"B1 Promotion":0,"B2 Policy":72,"B3 Infrastructure":100,"B4 Capacity":50,"B5 Assessment":100,"B6 Engagement":100,"B7 Cooperation":0},"total_score":81},{"country":"Egypt","region":"Arab States","iso2":"EG","lat":27.0,"lon":30.0,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"Y","B2.4":"U","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":null,"B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"P","B4.5":"Y","B5.1":null,"B5.2":"N","B5.3":null,"B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":"Y","Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"Y","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":0,"B2 Policy":89,"B3 Infrastructure":100,"B4 Capacity":50,"B5 Assessment":50,"B6 Engagement":100,"B7 Cooperation":100},"total_score":80},{"country":"Georgia","region":"Europe and North America","iso2":"GE","lat":42.0,"lon":43.5,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"U","B2.5":"U","B2.6":"U","B2.7":"Y","B2.8":"Y","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":"N","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":null,"Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"Y","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":0,"B2 Policy":78,"B3 Infrastructure":100,"B4 Capacity":80,"B5 Assessment":50,"B6 Engagement":100,"B7 Cooperation":100},"total_score":80},{"country":"Italy","region":"Europe and North America","iso2":"IT","lat":42.8333,"lon":12.8333,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"Y","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":null,"Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":0,"B2 Policy":89,"B3 Infrastructure":100,"B4 Capacity":40,"B5 Assessment":75,"B6 Engagement":100,"B7 Cooperation":100},"total_score":80},{"country":"Sweden","region":"Europe and North America","iso2":"SE","lat":62.0,"lon":15.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"N","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":"Y","B3.5":"Y","B3.6":"N","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"P","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"YES, at the national level","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":89,"B3 Infrastructure":75,"B4 Capacity":50,"B5 Assessment":75,"B6 Engagement":75,"B7 Cooperation":100},"total_score":80},{"country":"Luxembourg","region":"Europe and North America","iso2":"LU","lat":49.75,"lon":6.1667,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":null,"B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"N","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"P","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"Y","B6.1":"YES, at the institutional level","Q6.1 optA":"Y","Q6.1 optB":null,"Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":null,"Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"N","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":100,"B2 Policy":89,"B3 Infrastructure":75,"B4 Capacity":70,"B5 Assessment":100,"B6 Engagement":50,"B7 Cooperation":0},"total_score":79},{"country":"Algeria","region":"Arab States","iso2":"DZ","lat":28.0,"lon":3.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"U","B2.4":"U","B2.5":"U","B2.6":"U","B2.7":"Y","B2.8":"Y","B2.9":"U","B3.3":"Y","B3.4":"U","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"N","B3.6":"Y","B4.1":"Y","B4.2":"Y","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":67,"B3 Infrastructure":62,"B4 Capacity":100,"B5 Assessment":75,"B6 Engagement":0,"B7 Cooperation":100},"total_score":78},{"country":"Belarus","region":"Europe and North America","iso2":"BY","lat":53.0,"lon":28.0,"ldc":false,"A15":"Other","B1.1":"N","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"N","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"YES, at the institutional level","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":75,"B2 Policy":89,"B3 Infrastructure":75,"B4 Capacity":60,"B5 Assessment":75,"B6 Engagement":50,"B7 Cooperation":100},"total_score":78},{"country":"Costa Rica","region":"Latin America and the Caribbean","iso2":"CR","lat":10.0,"lon":-84.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"N","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"N","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"N","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"Y","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"YES, at the institutional level","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":null,"Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"N","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":56,"B3 Infrastructure":100,"B4 Capacity":100,"B5 Assessment":75,"B6 Engagement":50,"B7 Cooperation":50},"total_score":78},{"country":"Hungary","region":"Europe and North America","iso2":"HU","lat":47.0,"lon":20.0,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"Y","B2.3":"Y","B2.4":"N","B2.5":"Y","B2.6":"U","B2.7":"Y","B2.8":"Y","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"Y","B3.6":"N","B4.1":"Y","B4.2":"Y","B4.3":"N","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"Y","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":"Y","Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":0,"B2 Policy":72,"B3 Infrastructure":75,"B4 Capacity":80,"B5 Assessment":75,"B6 Engagement":100,"B7 Cooperation":100},"total_score":78},{"country":"Norway","region":"Europe and North America","iso2":"NO","lat":62.0,"lon":10.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"N","B2.7":"Y","B2.8":"N","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"N","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"P","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":null,"Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"Y","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":75,"B2 Policy":78,"B3 Infrastructure":75,"B4 Capacity":70,"B5 Assessment":100,"B6 Engagement":100,"B7 Cooperation":50},"total_score":78},{"country":"Belgium","region":"Europe and North America","iso2":"BE","lat":50.8333,"lon":4.0,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"Y","B2.4":"U","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"N","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"P","B4.5":"Y","B5.1":"Y","B5.2":null,"B5.3":"Y","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":null,"Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"N","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":0,"B2 Policy":78,"B3 Infrastructure":100,"B4 Capacity":70,"B5 Assessment":100,"B6 Engagement":100,"B7 Cooperation":0},"total_score":77},{"country":"Dominican Republic","region":"Latin America and the Caribbean","iso2":"DO","lat":19.0,"lon":-70.6667,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"N","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"P","B2.3":"Y","B2.4":"N","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":null,"B4.3":"N","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"N","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":"Y","B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":0,"B2 Policy":72,"B3 Infrastructure":100,"B4 Capacity":75,"B5 Assessment":50,"B6 Engagement":100,"B7 Cooperation":100},"total_score":77},{"country":"France","region":"Europe and North America","iso2":"FR","lat":46.0,"lon":2.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"N","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"N","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"Y","B5.4":"Y","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":89,"B3 Infrastructure":75,"B4 Capacity":40,"B5 Assessment":75,"B6 Engagement":0,"B7 Cooperation":100},"total_score":76},{"country":"Slovenia","region":"Europe and North America","iso2":"SI","lat":46.0,"lon":15.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"N","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"Y","B3.6":"N","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"P","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"N","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":75,"B2 Policy":78,"B3 Infrastructure":75,"B4 Capacity":50,"B5 Assessment":75,"B6 Engagement":100,"B7 Cooperation":100},"total_score":74},{"country":"Switzerland","region":"Europe and North America","iso2":"CH","lat":47.0,"lon":8.0,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"N","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":null,"Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"N","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":0,"B2 Policy":83,"B3 Infrastructure":100,"B4 Capacity":60,"B5 Assessment":75,"B6 Engagement":100,"B7 Cooperation":0},"total_score":74},{"country":"Senegal","region":"Africa","iso2":"SN","lat":14.0,"lon":-14.0,"ldc":true,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"N","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"U","B2.4":"U","B2.5":"Y","B2.6":"N","B2.7":null,"B2.8":"Y","B2.9":"U","B3.3":"Y","B3.4":"N","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":null,"B4.1":"Y","B4.2":"Y","B4.3":null,"B4.4":"Y","B4.5":"Y","B5.1":null,"B5.2":"Y","B5.3":null,"B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":null,"B7.3":null,"B8.1":null,"section_scores":{"B1 Promotion":75,"B2 Policy":62,"B3 Infrastructure":33,"B4 Capacity":100,"B5 Assessment":100,"B6 Engagement":100,"B7 Cooperation":0},"total_score":73},{"country":"Latvia","region":"Europe and North America","iso2":"LV","lat":57.0,"lon":25.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"N","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"N","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"YES, at the national level","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":null,"Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"N","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":75,"B2 Policy":89,"B3 Infrastructure":50,"B4 Capacity":60,"B5 Assessment":75,"B6 Engagement":75,"B7 Cooperation":50},"total_score":72},{"country":"Nigeria","region":"Africa","iso2":"NG","lat":10.0,"lon":8.0,"ldc":false,"A15":"Public;Private;Civil Society","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"N","B2.6":"N","B2.7":"N","B2.8":"Y","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"P","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":"Y","B7.2":"Y","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":100,"B2 Policy":61,"B3 Infrastructure":100,"B4 Capacity":70,"B5 Assessment":25,"B6 Engagement":100,"B7 Cooperation":100},"total_score":72},{"country":"Denmark","region":"Europe and North America","iso2":"DK","lat":56.0,"lon":10.0,"ldc":false,"A15":null,"B1.1":"N","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"N","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"N","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":null,"B3.4 optD":"Y","B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"Y","B6.1":"YES, at the institutional level","Q6.1 optA":"Y","Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":null,"Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"Y","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":50,"B2 Policy":78,"B3 Infrastructure":100,"B4 Capacity":40,"B5 Assessment":100,"B6 Engagement":50,"B7 Cooperation":50},"total_score":71},{"country":"Sierra Leone","region":"Africa","iso2":"SL","lat":8.5,"lon":-11.5,"ldc":true,"A15":"Public;Other","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"N","B2.7":"N","B2.8":"N","B2.9":"U","B3.3":"Y","B3.4":"U","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":"Y","B3.4 optD":null,"B3.5":"N","B3.6":"Y","B4.1":"Y","B4.2":"Y","B4.3":"N","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"N","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":56,"B3 Infrastructure":62,"B4 Capacity":80,"B5 Assessment":50,"B6 Engagement":100,"B7 Cooperation":100},"total_score":71},{"country":"Cyprus","region":"Europe and North America","iso2":"CY","lat":35.0,"lon":33.0,"ldc":false,"A15":"Public;Private","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"N","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"N","B2.8":"N","B2.9":"Y","B3.3":null,"B3.4":"U","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":null,"B4.1":null,"B4.2":null,"B4.3":null,"B4.4":null,"B4.5":null,"B5.1":null,"B5.2":null,"B5.3":null,"B5.4":null,"B6.1":null,"Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":null,"B7.3":null,"B8.1":null,"section_scores":{"B1 Promotion":100,"B2 Policy":67,"B3 Infrastructure":25,"B4 Capacity":0,"B5 Assessment":0,"B6 Engagement":0,"B7 Cooperation":0},"total_score":70},{"country":"Iran (Islamic Republic of)","region":"Asia and the Pacific","iso2":"IR","lat":32.0,"lon":53.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"P","B2.3":"Y","B2.4":"U","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"N","B2.9":"N","B3.3":"N","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":"Y","B3.5":"N","B3.6":"N","B4.1":"Y","B4.2":"Y","B4.3":"N","B4.4":"N","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":"Y","Q6.1 optF":null,"Q6.1 optG":"Y","B7.2":"Y","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":100,"B2 Policy":67,"B3 Infrastructure":25,"B4 Capacity":60,"B5 Assessment":75,"B6 Engagement":100,"B7 Cooperation":100},"total_score":69},{"country":"Indonesia","region":"Asia and the Pacific","iso2":"ID","lat":-5.0,"lon":120.0,"ldc":false,"A15":"Public;Private;Civil Society","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"U","B2.7":"Y","B2.8":"N","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"Y","B3.6":"Y","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"Y","B4.5":"N","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"Y","B6.1":"YES, at the national level","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":100,"B2 Policy":78,"B3 Infrastructure":100,"B4 Capacity":20,"B5 Assessment":25,"B6 Engagement":75,"B7 Cooperation":100},"total_score":68},{"country":"Mexico","region":"Latin America and the Caribbean","iso2":"MX","lat":23.0,"lon":-102.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"P","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"N","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":"Y","B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"P","B4.5":"Y","B5.1":"N","B5.2":"Y","B5.3":"N","B5.4":"N","B6.1":"YES, at the institutional level","Q6.1 optA":"Y","Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"Y","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":83,"B3 Infrastructure":100,"B4 Capacity":30,"B5 Assessment":25,"B6 Engagement":50,"B7 Cooperation":50},"total_score":67},{"country":"Czechia","region":"Europe and North America","iso2":"CZ","lat":49.75,"lon":15.5,"ldc":false,"A15":"Public","B1.1":"N","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":null,"B2.1 optD":null,"B2.2":"P","B2.3":"U","B2.4":"U","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"N","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"N","B4.1":"Y","B4.2":"Y","B4.3":"Y","B4.4":"P","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"Y","B5.4":"Y","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":50,"B2 Policy":72,"B3 Infrastructure":75,"B4 Capacity":90,"B5 Assessment":75,"B6 Engagement":0,"B7 Cooperation":0},"total_score":66},{"country":"T\u00fcrkiye","region":"Europe and North America","iso2":"TR","lat":39.0,"lon":35.0,"ldc":false,"A15":"Civil Society","B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":null,"B2.1 optD":null,"B2.2":"N","B2.3":"Y","B2.4":"N","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"N","B3.3":"N","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"N","B4.1":"Y","B4.2":null,"B4.3":null,"B4.4":null,"B4.5":null,"B5.1":"Y","B5.2":"N","B5.3":"Y","B5.4":null,"B6.1":null,"Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":75,"B2 Policy":67,"B3 Infrastructure":50,"B4 Capacity":100,"B5 Assessment":67,"B6 Engagement":0,"B7 Cooperation":50},"total_score":65},{"country":"Bahrain","region":"Arab States","iso2":"BH","lat":26.0,"lon":50.55,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":null,"B2.2":"P","B2.3":"U","B2.4":"U","B2.5":"Y","B2.6":"N","B2.7":"N","B2.8":"Y","B2.9":"N","B3.3":"N","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"N","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":null,"B5.3":null,"B5.4":"N","B6.1":"YES, at the national level","Q6.1 optA":null,"Q6.1 optB":"Y","Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"Y","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":50,"B3 Infrastructure":50,"B4 Capacity":80,"B5 Assessment":50,"B6 Engagement":75,"B7 Cooperation":50},"total_score":64},{"country":"United Republic of Tanzania","region":"Africa","iso2":"TZ","lat":-6.0,"lon":35.0,"ldc":true,"A15":"Public;Private","B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"N","B2.3":"N","B2.4":"N","B2.5":"Y","B2.6":"N","B2.7":"Y","B2.8":"Y","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"N","B3.4 optC":"N","B3.4 optD":"N","B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"P","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"Y","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":75,"B2 Policy":44,"B3 Infrastructure":100,"B4 Capacity":70,"B5 Assessment":50,"B6 Engagement":100,"B7 Cooperation":50},"total_score":64},{"country":"Lithuania","region":"Europe and North America","iso2":"LT","lat":56.0,"lon":24.0,"ldc":false,"A15":"Public;","B1.1":"Y","B1.2":"Y","B1.3":"N","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":null,"B2.2":"P","B2.3":"U","B2.4":"U","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"N","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"N","B4.5":"N","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":75,"B2 Policy":67,"B3 Infrastructure":100,"B4 Capacity":40,"B5 Assessment":75,"B6 Engagement":0,"B7 Cooperation":0},"total_score":62},{"country":"Romania","region":"Europe and North America","iso2":"RO","lat":46.0,"lon":25.0,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"Y","B2.4":"N","B2.5":"U","B2.6":"Y","B2.7":"Y","B2.8":"N","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"N","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"Y","B6.1":"YES, at the national level","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":0,"B2 Policy":61,"B3 Infrastructure":50,"B4 Capacity":60,"B5 Assessment":100,"B6 Engagement":75,"B7 Cooperation":0},"total_score":61},{"country":"Ecuador","region":"Latin America and the Caribbean","iso2":"EC","lat":-2.0,"lon":-77.5,"ldc":false,"A15":"Civil Society","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":null,"B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":null,"B2.2":"N","B2.3":"N","B2.4":"U","B2.5":"N","B2.6":"N","B2.7":"N","B2.8":"Y","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"Y","B4.3":"N","B4.4":"N","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":"Y","Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":28,"B3 Infrastructure":100,"B4 Capacity":60,"B5 Assessment":25,"B6 Engagement":100,"B7 Cooperation":100},"total_score":60},{"country":"Japan","region":"Asia and the Pacific","iso2":"JP","lat":36.0,"lon":138.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":null,"B2.1 optD":null,"B2.2":"P","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"Y","B2.7":"N","B2.8":"N","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"N","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"Y","B4.5":"Y","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":100,"B2 Policy":72,"B3 Infrastructure":75,"B4 Capacity":60,"B5 Assessment":0,"B6 Engagement":100,"B7 Cooperation":0},"total_score":60},{"country":"Mongolia","region":"Asia and the Pacific","iso2":"MN","lat":46.0,"lon":105.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"N","B2.1 optA":"Y","B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"U","B2.4":"N","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":"Y","B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"Y","B4.2":"Y","B4.3":"N","B4.4":"P","B4.5":"N","B5.1":"Y","B5.2":"N","B5.3":"Y","B5.4":"N","B6.1":"YES, at the national level","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":61,"B3 Infrastructure":50,"B4 Capacity":50,"B5 Assessment":50,"B6 Engagement":75,"B7 Cooperation":0},"total_score":58},{"country":"Congo","region":"Africa","iso2":"CG","lat":-1.0,"lon":15.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"Y","B2.3":"Y","B2.4":"N","B2.5":"N","B2.6":"N","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"N","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":null,"B5.1":"Y","B5.2":"Y","B5.3":"N","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":75,"B2 Policy":67,"B3 Infrastructure":25,"B4 Capacity":25,"B5 Assessment":75,"B6 Engagement":100,"B7 Cooperation":50},"total_score":57},{"country":"Libya","region":"Arab States","iso2":"LY","lat":25.0,"lon":17.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"Y","B1.3":null,"B1.4":null,"B2.1":"N","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":null,"B2.3":null,"B2.4":null,"B2.5":null,"B2.6":null,"B2.7":null,"B2.8":null,"B2.9":null,"B3.3":"N","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":null,"B3.4 optD":null,"B3.5":null,"B3.6":null,"B4.1":"N","B4.2":null,"B4.3":null,"B4.4":null,"B4.5":null,"B5.1":"Y","B5.2":null,"B5.3":null,"B5.4":null,"B6.1":null,"Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":null,"B7.3":null,"B8.1":"Y","section_scores":{"B1 Promotion":100,"B2 Policy":0,"B3 Infrastructure":50,"B4 Capacity":0,"B5 Assessment":100,"B6 Engagement":0,"B7 Cooperation":0},"total_score":57},{"country":"Togo","region":"Africa","iso2":"TG","lat":8.0,"lon":1.1667,"ldc":true,"A15":null,"B1.1":"N","B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":null,"B2.3":null,"B2.4":null,"B2.5":null,"B2.6":null,"B2.7":null,"B2.8":null,"B2.9":null,"B3.3":"Y","B3.4":"N","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":null,"B3.6":null,"B4.1":"Y","B4.2":null,"B4.3":null,"B4.4":null,"B4.5":null,"B5.1":"Y","B5.2":null,"B5.3":null,"B5.4":null,"B6.1":"YES, at the institutional level","Q6.1 optA":"Y","Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":null,"Q6.1 optG":"Y","B7.2":"N","B7.3":null,"B8.1":"Y","section_scores":{"B1 Promotion":0,"B2 Policy":100,"B3 Infrastructure":50,"B4 Capacity":100,"B5 Assessment":100,"B6 Engagement":50,"B7 Cooperation":0},"total_score":56},{"country":"Brazil","region":"Latin America and the Caribbean","iso2":"BR","lat":-10.0,"lon":-55.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"N","B2.3":"N","B2.4":"N","B2.5":"Y","B2.6":"Y","B2.7":"N","B2.8":"N","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"Y","B5.4":"N","B6.1":"YES, at the institutional level","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":39,"B3 Infrastructure":100,"B4 Capacity":40,"B5 Assessment":50,"B6 Engagement":50,"B7 Cooperation":0},"total_score":55},{"country":"Cuba","region":"Latin America and the Caribbean","iso2":"CU","lat":21.5,"lon":-80.0,"ldc":false,"A15":"Public;Private;Civil Society","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"N","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"U","B2.4":"N","B2.5":"Y","B2.6":"N","B2.7":"N","B2.8":"Y","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":"Y","B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"Y","B4.4":"P","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":75,"B2 Policy":50,"B3 Infrastructure":75,"B4 Capacity":70,"B5 Assessment":25,"B6 Engagement":100,"B7 Cooperation":0},"total_score":55},{"country":"Azerbaijan","region":"Europe and North America","iso2":"AZ","lat":40.5,"lon":47.5,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":null,"B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"N","B2.7":"Y","B2.8":"Y","B2.9":"N","B3.3":"N","B3.4":"N","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"U","B3.6":"N","B4.1":"N","B4.2":"Y","B4.3":"N","B4.4":"P","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"N","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":67,"B2 Policy":78,"B3 Infrastructure":12,"B4 Capacity":50,"B5 Assessment":75,"B6 Engagement":0,"B7 Cooperation":0},"total_score":54},{"country":"Greece","region":"Europe and North America","iso2":"GR","lat":39.0,"lon":22.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"N","B2.3":"N","B2.4":"U","B2.5":"Y","B2.6":"U","B2.7":"Y","B2.8":"N","B2.9":"U","B3.3":"Y","B3.4":"U","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":"Y","B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"YES, at the national level","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":null,"Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":75,"B2 Policy":50,"B3 Infrastructure":88,"B4 Capacity":60,"B5 Assessment":25,"B6 Engagement":75,"B7 Cooperation":0},"total_score":54},{"country":"Philippines","region":"Asia and the Pacific","iso2":"PH","lat":13.0,"lon":122.0,"ldc":false,"A15":"Public","B1.1":"N","B1.2":"N","B1.3":"N","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"Y","B2.3":"Y","B2.4":"N","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"Y","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":"Y","B3.4 optD":null,"B3.5":"N","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"Y","B5.1":"N","B5.2":"N","B5.3":"Y","B5.4":"N","B6.1":"YES, at the national level","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":"Y","Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":25,"B2 Policy":89,"B3 Infrastructure":75,"B4 Capacity":40,"B5 Assessment":25,"B6 Engagement":75,"B7 Cooperation":0},"total_score":54},{"country":"Mauritius","region":"Africa","iso2":"MU","lat":-20.2833,"lon":57.55,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":"Y","B2.2":"N","B2.3":"N","B2.4":"N","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"U","B3.3":"N","B3.4":"N","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"N","B5.1":"Y","B5.2":"N","B5.3":"Y","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"Y","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":100,"B2 Policy":61,"B3 Infrastructure":50,"B4 Capacity":0,"B5 Assessment":50,"B6 Engagement":100,"B7 Cooperation":50},"total_score":53},{"country":"Pakistan","region":"Asia and the Pacific","iso2":"PK","lat":30.0,"lon":70.0,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"N","B2.4":"N","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"Y","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"Y","B4.5":"Y","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":0,"B2 Policy":67,"B3 Infrastructure":75,"B4 Capacity":60,"B5 Assessment":0,"B6 Engagement":100,"B7 Cooperation":0},"total_score":52},{"country":"Slovakia","region":"Europe and North America","iso2":"SK","lat":48.6667,"lon":19.5,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"Y","B2.5":"U","B2.6":"Y","B2.7":"N","B2.8":"Y","B2.9":"U","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":"Y","B3.5":"N","B3.6":"Y","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"Y","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"Y","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":75,"B2 Policy":78,"B3 Infrastructure":75,"B4 Capacity":20,"B5 Assessment":25,"B6 Engagement":0,"B7 Cooperation":0},"total_score":52},{"country":"Ukraine","region":"Europe and North America","iso2":"UA","lat":49.0,"lon":32.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"N","B2.7":"Y","B2.8":"N","B2.9":"Y","B3.3":"Y","B3.4":"U","B3.4 optA":"N","B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"Y","B3.6":"N","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"Y","B4.5":"N","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":75,"B2 Policy":72,"B3 Infrastructure":62,"B4 Capacity":40,"B5 Assessment":0,"B6 Engagement":0,"B7 Cooperation":50},"total_score":52},{"country":"Angola","region":"Africa","iso2":"AO","lat":-12.5,"lon":18.5,"ldc":true,"A15":"Private;","B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"U","B2.4":"U","B2.5":"Y","B2.6":"N","B2.7":"Y","B2.8":"N","B2.9":"N","B3.3":"N","B3.4":"N","B3.4 optA":null,"B3.4 optB":"Y","B3.4 optC":"Y","B3.4 optD":"Y","B3.5":"N","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"Y","B5.1":"Y","B5.2":"N","B5.3":"Y","B5.4":"Y","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":null,"Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":75,"B2 Policy":50,"B3 Infrastructure":25,"B4 Capacity":40,"B5 Assessment":75,"B6 Engagement":100,"B7 Cooperation":0},"total_score":50},{"country":"Guinea-Bissau","region":"Africa","iso2":"GW","lat":12.0,"lon":-15.0,"ldc":true,"A15":null,"B1.1":"N","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"Y","B2.3":"Y","B2.4":"N","B2.5":"U","B2.6":"N","B2.7":"Y","B2.8":"N","B2.9":"Y","B3.3":"Y","B3.4":"N","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"N","B5.1":"Y","B5.2":"Y","B5.3":"Y","B5.4":"Y","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"Y","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":50,"B2 Policy":61,"B3 Infrastructure":25,"B4 Capacity":0,"B5 Assessment":100,"B6 Engagement":0,"B7 Cooperation":50},"total_score":47},{"country":"Peru","region":"Latin America and the Caribbean","iso2":"PE","lat":-10.0,"lon":-76.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"Y","B2.3":"Y","B2.4":"U","B2.5":"Y","B2.6":"N","B2.7":"Y","B2.8":"N","B2.9":"U","B3.3":"N","B3.4":"U","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"Y","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"Y","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"YES, at the national level","Q6.1 optA":"Y","Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":67,"B3 Infrastructure":38,"B4 Capacity":20,"B5 Assessment":0,"B6 Engagement":75,"B7 Cooperation":0},"total_score":46},{"country":"Armenia","region":"Europe and North America","iso2":"AM","lat":40.0,"lon":45.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"Y","B2.1":"N","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"N","B2.3":"Y","B2.4":"Y","B2.5":"Y","B2.6":"N","B2.7":"Y","B2.8":"N","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"N","B5.1":"Y","B5.2":"N","B5.3":"N","B5.4":"Y","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":75,"B2 Policy":44,"B3 Infrastructure":50,"B4 Capacity":20,"B5 Assessment":50,"B6 Engagement":0,"B7 Cooperation":0},"total_score":41},{"country":"State of Palestine","region":"Arab States","iso2":"PS","lat":32.0,"lon":35.25,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"N","B2.3":"N","B2.4":"Y","B2.5":"N","B2.6":"N","B2.7":"Y","B2.8":"N","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":"Y","B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"N","B4.2":"N","B4.3":"Y","B4.4":"N","B4.5":"Y","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":100,"B2 Policy":33,"B3 Infrastructure":50,"B4 Capacity":40,"B5 Assessment":0,"B6 Engagement":0,"B7 Cooperation":50},"total_score":41},{"country":"Benin","region":"Africa","iso2":"BJ","lat":9.5,"lon":2.25,"ldc":true,"A15":null,"B1.1":"N","B1.2":"N","B1.3":"N","B1.4":"N","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"N","B2.3":"Y","B2.4":"N","B2.5":"Y","B2.6":"N","B2.7":"N","B2.8":"Y","B2.9":"N","B3.3":"Y","B3.4":"N","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"Y","B4.5":"Y","B5.1":"Y","B5.2":"Y","B5.3":"N","B5.4":"N","B6.1":"YES, at the institutional level","Q6.1 optA":null,"Q6.1 optB":"Y","Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"Y","B7.3":"Y","B8.1":"N","section_scores":{"B1 Promotion":0,"B2 Policy":44,"B3 Infrastructure":25,"B4 Capacity":40,"B5 Assessment":50,"B6 Engagement":50,"B7 Cooperation":100},"total_score":40},{"country":"C\u00f4te d'Ivoire","region":"Africa","iso2":"CI","lat":8.0,"lon":-5.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"Y","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"N","B2.3":"N","B2.4":"N","B2.5":"N","B2.6":"N","B2.7":"N","B2.8":"N","B2.9":"N","B3.3":"Y","B3.4":"U","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":"Y","B3.4 optD":null,"B3.5":"Y","B3.6":"Y","B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"P","B4.5":"Y","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":100,"B2 Policy":11,"B3 Infrastructure":88,"B4 Capacity":50,"B5 Assessment":0,"B6 Engagement":0,"B7 Cooperation":0},"total_score":38},{"country":"North Macedonia","region":"Europe and North America","iso2":"MK","lat":41.8333,"lon":22.0,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"N","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"N","B2.3":"Y","B2.4":"U","B2.5":"Y","B2.6":"Y","B2.7":"Y","B2.8":"N","B2.9":"N","B3.3":"Y","B3.4":"U","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"Y","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"Y","B4.5":"Y","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"YES, at the institutional level","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":"Y","B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":0,"B2 Policy":50,"B3 Infrastructure":62,"B4 Capacity":40,"B5 Assessment":0,"B6 Engagement":50,"B7 Cooperation":0},"total_score":38},{"country":"India","region":"Asia and the Pacific","iso2":"IN","lat":20.0,"lon":77.0,"ldc":false,"A15":"Public","B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"N","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":null,"B2.1 optD":null,"B2.2":"Y","B2.3":"Y","B2.4":"N","B2.5":"Y","B2.6":"N","B2.7":"N","B2.8":"N","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"P","B4.5":"N","B5.1":"N","B5.2":"Y","B5.3":"N","B5.4":"N","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":50,"B2 Policy":44,"B3 Infrastructure":50,"B4 Capacity":10,"B5 Assessment":25,"B6 Engagement":0,"B7 Cooperation":0},"total_score":33},{"country":"Morocco","region":"Arab States","iso2":"MA","lat":32.0,"lon":-5.0,"ldc":false,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"N","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"N","B2.4":"N","B2.5":"U","B2.6":"Y","B2.7":"N","B2.8":"N","B2.9":"N","B3.3":"N","B3.4":"N","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"P","B4.5":"Y","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":null,"B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":75,"B2 Policy":33,"B3 Infrastructure":0,"B4 Capacity":30,"B5 Assessment":0,"B6 Engagement":0,"B7 Cooperation":0},"total_score":27},{"country":"Russian Federation","region":"Europe and North America","iso2":"RU","lat":60.0,"lon":100.0,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"P","B2.3":"N","B2.4":"N","B2.5":"N","B2.6":"N","B2.7":"N","B2.8":"N","B2.9":"N","B3.3":"Y","B3.4":"Y","B3.4 optA":"Y","B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"Y","B3.6":"N","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"P","B4.5":"Y","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":0,"B2 Policy":17,"B3 Infrastructure":75,"B4 Capacity":30,"B5 Assessment":0,"B6 Engagement":0,"B7 Cooperation":0},"total_score":24},{"country":"Timor-Leste","region":"Asia and the Pacific","iso2":"TL","lat":-8.55,"lon":125.5167,"ldc":true,"A15":"Public;Private;Civil Society","B1.1":"N","B1.2":"N","B1.3":"N","B1.4":"Y","B2.1":"N","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"N","B2.3":"U","B2.4":"U","B2.5":"U","B2.6":"U","B2.7":"N","B2.8":"N","B2.9":"U","B3.3":"N","B3.4":"U","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"Y","B5.1":"N","B5.2":"N","B5.3":"Y","B5.4":"Y","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"Y","section_scores":{"B1 Promotion":25,"B2 Policy":28,"B3 Infrastructure":12,"B4 Capacity":20,"B5 Assessment":50,"B6 Engagement":0,"B7 Cooperation":0},"total_score":24},{"country":"Mauritania","region":"Arab States","iso2":"MR","lat":20.0,"lon":-12.0,"ldc":true,"A15":null,"B1.1":"Y","B1.2":"Y","B1.3":"Y","B1.4":"N","B2.1":"Y","B2.1 optA":null,"B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":null,"B2.2":"P","B2.3":"N","B2.4":"N","B2.5":"N","B2.6":"N","B2.7":"N","B2.8":"N","B2.9":"N","B3.3":"N","B3.4":"U","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":null,"B4.1":"Y","B4.2":"N","B4.3":"N","B4.4":"P","B4.5":"N","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":75,"B2 Policy":17,"B3 Infrastructure":17,"B4 Capacity":30,"B5 Assessment":0,"B6 Engagement":0,"B7 Cooperation":0},"total_score":23},{"country":"Uganda","region":"Africa","iso2":"UG","lat":1.0,"lon":32.0,"ldc":true,"A15":null,"B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"N","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":"Y","B2.1 optC":"Y","B2.1 optD":"Y","B2.2":"N","B2.3":"N","B2.4":"N","B2.5":"N","B2.6":"N","B2.7":"N","B2.8":"N","B2.9":"N","B3.3":"Y","B3.4":"U","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"N","B5.1":"Y","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":"Y","Q6.1 optG":"Y","B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":50,"B2 Policy":11,"B3 Infrastructure":38,"B4 Capacity":0,"B5 Assessment":25,"B6 Engagement":100,"B7 Cooperation":0},"total_score":22},{"country":"Mali","region":"Africa","iso2":"ML","lat":17.0,"lon":-4.0,"ldc":true,"A15":"Public;Private;Civil Society","B1.1":"Y","B1.2":"N","B1.3":"Y","B1.4":"N","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"N","B2.3":"N","B2.4":"N","B2.5":"N","B2.6":"U","B2.7":"N","B2.8":"N","B2.9":"U","B3.3":"Y","B3.4":"N","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"N","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":null,"Q6.1 optC":"Y","Q6.1 optD":null,"Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":50,"B2 Policy":22,"B3 Infrastructure":25,"B4 Capacity":0,"B5 Assessment":0,"B6 Engagement":100,"B7 Cooperation":0},"total_score":21},{"country":"Niger","region":"Africa","iso2":"NE","lat":16.0,"lon":8.0,"ldc":true,"A15":"Public;Civil Society","B1.1":"N","B1.2":"N","B1.3":"N","B1.4":"N","B2.1":"Y","B2.1 optA":"Y","B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"N","B2.3":"N","B2.4":"N","B2.5":"N","B2.6":"N","B2.7":"N","B2.8":"Y","B2.9":"N","B3.3":"Y","B3.4":"N","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"Y","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"YES, at both the national and institutional levels","Q6.1 optA":"Y","Q6.1 optB":"Y","Q6.1 optC":null,"Q6.1 optD":"Y","Q6.1 optE":"Y","Q6.1 optF":"Y","Q6.1 optG":null,"B7.2":"N","B7.3":"N","B8.1":"N","section_scores":{"B1 Promotion":0,"B2 Policy":22,"B3 Infrastructure":25,"B4 Capacity":20,"B5 Assessment":0,"B6 Engagement":100,"B7 Cooperation":0},"total_score":17},{"country":"Gambia","region":"Africa","iso2":"GM","lat":13.4667,"lon":-16.5667,"ldc":true,"A15":"Public;Private","B1.1":"Y","B1.2":"N","B1.3":"N","B1.4":"Y","B2.1":"Y","B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":"N","B2.3":"N","B2.4":"N","B2.5":"N","B2.6":"N","B2.7":"N","B2.8":"N","B2.9":"N","B3.3":"N","B3.4":"N","B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":"N","B3.6":"N","B4.1":"N","B4.2":"N","B4.3":"N","B4.4":"N","B4.5":"N","B5.1":"N","B5.2":"N","B5.3":"N","B5.4":"N","B6.1":"No","Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":"N","B7.3":"Y","B8.1":"Y","section_scores":{"B1 Promotion":50,"B2 Policy":11,"B3 Infrastructure":0,"B4 Capacity":0,"B5 Assessment":0,"B6 Engagement":0,"B7 Cooperation":50},"total_score":14},{"country":"Iraq","region":"Arab States","iso2":"IQ","lat":33.0,"lon":44.0,"ldc":false,"A15":null,"B1.1":null,"B1.2":null,"B1.3":null,"B1.4":null,"B2.1":null,"B2.1 optA":null,"B2.1 optB":null,"B2.1 optC":null,"B2.1 optD":null,"B2.2":null,"B2.3":null,"B2.4":null,"B2.5":null,"B2.6":null,"B2.7":null,"B2.8":null,"B2.9":null,"B3.3":null,"B3.4":null,"B3.4 optA":null,"B3.4 optB":null,"B3.4 optC":null,"B3.4 optD":null,"B3.5":null,"B3.6":null,"B4.1":null,"B4.2":null,"B4.3":null,"B4.4":null,"B4.5":null,"B5.1":null,"B5.2":null,"B5.3":null,"B5.4":null,"B6.1":null,"Q6.1 optA":null,"Q6.1 optB":null,"Q6.1 optC":null,"Q6.1 optD":null,"Q6.1 optE":null,"Q6.1 optF":null,"Q6.1 optG":null,"B7.2":null,"B7.3":null,"B8.1":null,"section_scores":{"B1 Promotion":0,"B2 Policy":0,"B3 Infrastructure":0,"B4 Capacity":0,"B5 Assessment":0,"B6 Engagement":0,"B7 Cooperation":0},"total_score":0}];
+const DATA = RAW_DATA.map(d => ({...d, _score: 0, _secScores: {}}));
+// pre-compute scores
+DATA.forEach(d => { d._score = 0; });
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+function init() {
+  buildOverview();
+  buildHeatmap();
+  buildCountrySelect();
+  buildRankings();
+  buildQuestionList();
+}
+
+// ═══════════════════════════════════════
+// VIEW SWITCHING
+// ═══════════════════════════════════════
+function showView(id, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function badge(v) {
+  const cls = v ? `badge-${v}` : 'badge-null';
+  const label = v === 'Y' ? 'Yes' : v === 'P' ? 'Partial' : v === 'U' ? 'Under dev.' : v === 'N' ? 'No' : v || '—';
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function regionClass(r) { return REGION_CLASS[r] || 'europe'; }
+
+function flagEmoji(iso2) {
+  if (!iso2 || iso2.length !== 2) return '🌐';
+  try {
+    return String.fromCodePoint(...[...iso2.toUpperCase()].map(c => 0x1F1E0 + c.charCodeAt(0) - 65));
+  } catch { return '🌐'; }
+}
+
+// ═══════════════════════════════════════
+// VIEW 1 — OVERVIEW
+// ═══════════════════════════════════════
+function buildOverview() {
+  // KPIs
+  const kpis = [
+    { q: 'B1.1', label: 'Promoted Recommendation', icon: '📢' },
+    { q: 'B2.1', label: 'Have National STI Policy', icon: '📋' },
+    { q: 'B3.3', label: 'Active NREN', icon: '🌐' },
+    { q: 'B5.1', label: 'Reviewing Research Assessment', icon: '🔬' },
+    { q: 'B7.3', label: 'Int\'l Funding Discussions', icon: '🤝' },
+  ];
+  const kpiEl = document.getElementById('kpi-row');
+  kpis.forEach(k => {
+    const yes = DATA.filter(d => d[k.q] === 'Y').length;
+    const pct = Math.round(yes / DATA.length * 100);
+    kpiEl.innerHTML += `<div class="kpi-card">
+      <div style="font-size:24px;margin-bottom:4px">${k.icon}</div>
+      <div class="kpi-n">${yes}<span style="font-size:20px;color:var(--text3)">/${DATA.length}</span></div>
+      <div class="kpi-label">${k.label}<br><span style="color:var(--teal)">${pct}%</span></div>
+    </div>`;
+  });
+
+  // Region bars
+  const regions = [...new Set(DATA.map(d => d.region))].filter(Boolean);
+  const regBars = document.getElementById('region-bars');
+  const regScores = {};
+  regions.forEach(r => {
+    const countries = DATA.filter(d => d.region === r);
+    const scores = countries.map(d => {
+      const vals = CORE_QS.map(q => scoreVal(d[q])).filter(s => s !== null);
+      return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length*100 : 0;
+    });
+    regScores[r] = Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+  });
+  const maxScore = Math.max(...Object.values(regScores));
+  const order = Object.entries(regScores).sort((a,b) => b[1]-a[1]);
+  order.forEach(([r, score]) => {
+    const rc = regionClass(r);
+    regBars.innerHTML += `<div class="reg-bar-row">
+      <div class="reg-name r-${rc}">${REGION_SHORT[r] || r}</div>
+      <div class="reg-track"><div class="reg-fill bg-${rc}" style="width:${score/maxScore*100}%"></div></div>
+      <div class="reg-pct">${score}%</div>
+    </div>`;
+  });
+
+  // Distribution canvas
+  const canvas = document.getElementById('dist-canvas');
+  const ctx = canvas.getContext('2d');
+  const allScores = DATA.map(d => {
+    const vals = CORE_QS.map(q => scoreVal(d[q])).filter(s => s !== null);
+    return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length*100 : 0;
+  });
+  // Bin into 10 buckets
+  const bins = new Array(10).fill(0);
+  allScores.forEach(s => { bins[Math.min(9, Math.floor(s/10))]++; });
+  const W = canvas.width, H = canvas.height;
+  const pad = {t:16,r:16,b:30,l:28};
+  const barW = (W - pad.l - pad.r) / 10 - 2;
+  const maxBin = Math.max(...bins);
+  ctx.clearRect(0, 0, W, H);
+  bins.forEach((count, i) => {
+    const x = pad.l + i * ((W - pad.l - pad.r) / 10);
+    const h = (count / maxBin) * (H - pad.t - pad.b);
+    const y = H - pad.b - h;
+    // gradient fill
+    const g = ctx.createLinearGradient(0, y, 0, H - pad.b);
+    g.addColorStop(0, 'rgba(245,200,66,0.8)');
+    g.addColorStop(1, 'rgba(245,200,66,0.15)');
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.roundRect(x+1, y, barW, h, 3);
+    ctx.fill();
+    // x label
+    ctx.fillStyle = 'rgba(143,163,190,0.6)';
+    ctx.font = '9px DM Mono, monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText((i*10) + '%', x + barW/2, H - pad.b + 12);
+  });
+  // y axis labels
+  ctx.fillStyle = 'rgba(143,163,190,0.5)';
+  ctx.font = '9px DM Mono, monospace';
+  ctx.textAlign = 'right';
+  ctx.fillText(maxBin, pad.l - 4, pad.t + 6);
+  ctx.fillText('0', pad.l - 4, H - pad.b + 3);
+
+  // Q overview grid
+  const grid = document.getElementById('q-overview-grid');
+  CORE_QS.forEach(q => {
+    const counts = {};
+    DATA.forEach(d => {
+      let v = d[q];
+      if (!v) v = null;
+      else if (v.toLowerCase().includes('both') || v === 'Y') v = 'Y';
+      else if (v.toLowerCase().includes('national') || v === 'P') v = 'P';
+      else if (v === 'U' || v.toLowerCase().includes('institutional')) v = 'U';
+      else if (v === 'N' || v.toLowerCase() === 'no') v = 'N';
+      counts[v] = (counts[v]||0) + 1;
+    });
+    const total = DATA.length;
+    const order = ['Y','P','U','N',null];
+    const segs = order.map(k => ({ k, n: counts[k]||0, pct: ((counts[k]||0)/total*100).toFixed(1) }));
+    const text = (QUESTIONS[q]||q).replace(/↳ /g,'');
+    grid.innerHTML += `<div class="q-overview-row" onclick="goToQuestion('${q}')">
+      <div class="q-overview-id">${q}</div>
+      <div class="q-overview-text">${text.length > 60 ? text.slice(0,58)+'…' : text}</div>
+      <div class="q-stacked">
+        ${segs.map(s => `<div class="q-stacked-seg" style="width:${s.pct}%;background:${VAL_COLORS[s.k]}"></div>`).join('')}
+      </div>
+      <div class="q-pct-row">
+        ${segs.filter(s=>s.n>0).map(s=>`<div class="q-pct-item" style="color:${VAL_COLORS[s.k]}">${s.k||'–'} ${s.n}</div>`).join('')}
+      </div>
+    </div>`;
+  });
+}
+
+function goToQuestion(q) {
+  document.querySelectorAll('.nav-btn')[4].click();
+  setTimeout(() => selectQuestion(q), 100);
+}
+
+// ═══════════════════════════════════════
+// VIEW 2 — HEATMAP
+// ═══════════════════════════════════════
+const HM_QS = ['B1.1','B1.2','B1.3','B1.4',
+  'B2.1','B2.2','B2.3','B2.4','B2.5','B2.6','B2.7','B2.8','B2.9',
+  'B3.3','B3.4','B3.5','B3.6',
+  'B4.1','B4.2','B4.3','B4.4','B4.5',
+  'B5.1','B5.2','B5.3','B5.4',
+  'B6.1','B7.2','B7.3','B8.1'];
+
+const HM_SECTIONS = [
+  {label:'B1',start:0,end:3,color:'#60a5fa'},
+  {label:'B2',start:4,end:12,color:'#a78bfa'},
+  {label:'B3',start:13,end:16,color:'#2dd4bf'},
+  {label:'B4',start:17,end:21,color:'#fbbf24'},
+  {label:'B5',start:22,end:25,color:'#f87171'},
+  {label:'B6',start:26,end:26,color:'#34d399'},
+  {label:'B7+',start:27,end:29,color:'#f59e0b'},
+];
+
+function hmValNorm(v) {
+  if (!v) return null;
+  if (v === 'Y') return 'Y';
+  if (v === 'P') return 'P';
+  if (v === 'U') return 'U';
+  if (v === 'N') return 'N';
+  if (v.toLowerCase().includes('both')) return 'Y';
+  if (v.toLowerCase().includes('national')) return 'P';
+  if (v.toLowerCase().includes('institutional')) return 'U';
+  if (v.toLowerCase() === 'no') return 'N';
+  return null;
+}
+
+function buildHeatmap() {
+  const regionF = document.getElementById('hm-region-filter').value;
+  const sortMode = document.getElementById('hm-sort').value;
+  const searchQ = document.getElementById('hm-search').value.toLowerCase();
+
+  let filtered = DATA.filter(d => {
+    if (regionF && d.region !== regionF) return false;
+    if (searchQ && !d.country.toLowerCase().includes(searchQ)) return false;
+    return true;
+  });
+
+  if (sortMode === 'score') {
+    filtered.sort((a,b) => {
+      const sa = CORE_QS.map(q=>scoreVal(a[q])).filter(s=>s!==null);
+      const sb = CORE_QS.map(q=>scoreVal(b[q])).filter(s=>s!==null);
+      const va = sa.length ? sa.reduce((x,y)=>x+y,0)/sa.length : 0;
+      const vb = sb.length ? sb.reduce((x,y)=>x+y,0)/sb.length : 0;
+      return vb - va;
+    });
+  } else if (sortMode === 'alpha') {
+    filtered.sort((a,b) => a.country.localeCompare(b.country));
+  } else {
+    filtered.sort((a,b) => a.region.localeCompare(b.region) || a.country.localeCompare(b.country));
+  }
+
+  const table = document.getElementById('heatmap-table');
+  let html = '<thead><tr>';
+  html += '<th class="row-corner">Country</th>';
+  HM_QS.forEach((q, i) => {
+    const sec = HM_SECTIONS.find(s => i >= s.start && i <= s.end);
+    const color = sec ? sec.color : '#fff';
+    html += `<th class="col-hd" style="color:${color}" onclick="goToQuestion('${q}')" title="${QUESTIONS[q]||q}">${q}</th>`;
+  });
+  html += '</tr></thead><tbody>';
+
+  let lastRegion = '';
+  filtered.forEach((d, ri) => {
+    if (sortMode === 'region' && d.region !== lastRegion) {
+      const rc = regionClass(d.region);
+      html += `<tr><td colspan="${HM_QS.length+1}" style="padding:6px 12px;background:var(--bg);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--${rc==='europe'?'r-europe':rc==='africa'?'r-africa':rc==='asia'?'r-asia':rc==='arab'?'r-arab':'r-latam'})">${d.region}</td></tr>`;
+      lastRegion = d.region;
+    }
+
+    const scores = CORE_QS.map(q => scoreVal(d[q])).filter(s => s !== null);
+    const score = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length*100) : 0;
+    const rc = regionClass(d.region);
+    html += `<tr>`;
+    html += `<td class="country-cell" onclick="goToCountry('${d.country}')">
+      ${d.country} <span class="score-pill">${score}%</span>
+    </td>`;
+    HM_QS.forEach(q => {
+      const v = hmValNorm(d[q]);
+      const sym = v === 'Y' ? '✓' : v === 'P' ? 'P' : v === 'U' ? 'U' : v === 'N' ? '✕' : '';
+      html += `<td onmouseenter="showTT(event,'${q}','${d.country}',${JSON.stringify(v)})" onmouseleave="hideTT()">
+        <div class="hm-cell cell-${v||'null'}">${sym}</div>
+      </td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+
+function goToCountry(name) {
+  document.querySelectorAll('.nav-btn')[2].click();
+  setTimeout(() => {
+    const sel = document.getElementById('country-select');
+    sel.value = name;
+    loadCountry(name);
+  }, 80);
+}
+
+// ═══════════════════════════════════════
+// TOOLTIP
+// ═══════════════════════════════════════
+function showTT(e, q, country, v) {
+  const tt = document.getElementById('tooltip');
+  document.getElementById('tt-q').textContent = q + ' — ' + (QUESTIONS[q]||'').slice(0,60);
+  document.getElementById('tt-country').textContent = country;
+  const label = v === 'Y' ? 'Yes' : v === 'P' ? 'Partial' : v === 'U' ? 'Under development' : v === 'N' ? 'No' : 'No data';
+  const color = VAL_COLORS[v] || 'var(--text2)';
+  document.getElementById('tt-val').innerHTML = `<span style="color:${color};font-weight:600">${label}</span>`;
+  tt.style.left = Math.min(e.clientX + 14, window.innerWidth - 300) + 'px';
+  tt.style.top = (e.clientY - 60) + 'px';
+  tt.classList.add('show');
+}
+function hideTT() { document.getElementById('tooltip').classList.remove('show'); }
+
+// ═══════════════════════════════════════
+// VIEW 3 — COUNTRY
+// ═══════════════════════════════════════
+function buildCountrySelect() {
+  const sel = document.getElementById('country-select');
+  const sorted = [...DATA].sort((a,b) => a.country.localeCompare(b.country));
+  sorted.forEach(d => {
+    sel.innerHTML += `<option value="${d.country}">${flagEmoji(d.iso2)} ${d.country}</option>`;
+  });
+  loadCountry(sorted[0].country);
+}
+
+function loadCountry(name) {
+  const d = DATA.find(x => x.country === name);
+  if (!d) return;
+
+  const scores = CORE_QS.map(q => scoreVal(d[q])).filter(s => s !== null);
+  const total = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length*100) : 0;
+  const secScores = Object.fromEntries(Object.keys(SECTIONS).map(k => [k, sectionScore(d, k)]));
+  const rc = regionClass(d.region);
+
+  let html = `
+  <div class="country-header-card">
+    <div style="font-size:48px">${flagEmoji(d.iso2)}</div>
+    <div>
+      <div class="country-name">${d.country}</div>
+      <div class="country-meta">
+        <span class="r-${rc}">${d.region}</span>
+        ${d.ldc ? ' &nbsp;·&nbsp; <span style="color:var(--amber);font-size:11px">Least Developed Country</span>' : ''}
+      </div>
+    </div>
+    <div>
+      <div class="country-score-big">${total}<span style="font-size:24px;color:var(--text3)">%</span></div>
+      <div class="country-score-label">Overall Score</div>
+    </div>
+  </div>
+  <div class="country-grid">
+    <div class="card">
+      <div class="card-title">Section Radar</div>
+      <div class="radar-wrap">${buildRadar(secScores, rc)}</div>
+    </div>
+    <div class="card" style="overflow-y:auto;max-height:440px">
+      <div class="card-title">Response Detail</div>
+      <div class="section-detail" id="sec-detail-body">`;
+
+  Object.entries(SECTIONS).forEach(([secKey, sec]) => {
+    const sscore = secScores[secKey];
+    const qRows = sec.qs.map(q => {
+      const v = d[q];
+      const norm = hmValNorm(v) || (v ? 'Y' : null);
+      return `<div class="q-row">
+        <div class="q-id">${q}</div>
+        <div class="q-text">${(QUESTIONS[q]||q).replace(/↳ /,'')}</div>
+        <div class="q-val">${badge(norm)}</div>
+      </div>`;
+    }).join('');
+    html += `<div class="sec-block">
+      <div class="sec-block-hd" onclick="this.nextElementSibling.classList.toggle('open')">
+        <span class="sec-block-title" style="color:${sec.color}">${secKey}</span>
+        <span class="sec-block-score">${sscore}%</span>
+      </div>
+      <div class="sec-block-body open">${qRows}</div>
+    </div>`;
+  });
+
+  html += `</div></div></div>`;
+  document.getElementById('country-content').innerHTML = html;
+}
+
+function buildRadar(secScores, rc) {
+  const keys = Object.keys(SECTIONS);
+  const vals = keys.map(k => secScores[k]/100);
+  const N = keys.length;
+  const cx = 160, cy = 155, R = 120;
+  const angles = keys.map((_, i) => (i / N) * Math.PI * 2 - Math.PI/2);
+
+  // grid rings
+  let svg = `<svg id="radar-chart" width="320" height="310" viewBox="0 0 320 310">
+  <defs>
+    <radialGradient id="rg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="${REGION_COLORS['Europe and North America']}" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="${REGION_COLORS['Europe and North America']}" stop-opacity="0"/>
+    </radialGradient>
+  </defs>`;
+
+  // rings
+  [0.25,0.5,0.75,1].forEach(t => {
+    const pts = angles.map(a => [cx + R*t*Math.cos(a), cy + R*t*Math.sin(a)]);
+    svg += `<polygon points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+  });
+  // spokes
+  angles.forEach(a => {
+    svg += `<line x1="${cx}" y1="${cy}" x2="${cx + R*Math.cos(a)}" y2="${cy + R*Math.sin(a)}" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>`;
+  });
+
+  // data polygon
+  const pts = vals.map((v, i) => [cx + R*v*Math.cos(angles[i]), cy + R*v*Math.sin(angles[i])]);
+  const color = REGION_COLORS['Europe and North America']; // gold
+  svg += `<polygon points="${pts.map(p=>p.join(',')).join(' ')}" fill="${'rgba(245,200,66,0.15)'}" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/>`;
+  pts.forEach(([x,y],i) => {
+    svg += `<circle cx="${x}" cy="${y}" r="4" fill="var(--gold)" stroke="var(--bg2)" stroke-width="2"/>`;
+  });
+
+  // labels
+  keys.forEach((k, i) => {
+    const a = angles[i];
+    const lx = cx + (R + 22) * Math.cos(a);
+    const ly = cy + (R + 22) * Math.sin(a);
+    const anchor = lx < cx - 5 ? 'end' : lx > cx + 5 ? 'start' : 'middle';
+    const shortKey = k.split(' ')[0];
+    svg += `<text x="${lx}" y="${ly}" text-anchor="${anchor}" dominant-baseline="middle"
+      font-family="DM Mono, monospace" font-size="10" fill="${SECTIONS[k].color}" opacity="0.9">${shortKey}</text>`;
+    svg += `<text x="${lx}" y="${ly+11}" text-anchor="${anchor}" dominant-baseline="middle"
+      font-family="DM Mono, monospace" font-size="9" fill="rgba(255,255,255,0.4)">${secScores[k]}%</text>`;
+  });
+  svg += '</svg>';
+  return svg;
+}
+
+// ═══════════════════════════════════════
+// VIEW 4 — RANKINGS
+// ═══════════════════════════════════════
+function buildRankings() {
+  const regionF = document.getElementById('rank-region').value;
+  const secF = document.getElementById('rank-section').value;
+
+  let filtered = DATA.filter(d => !regionF || d.region === regionF);
+
+  const getScore = d => {
+    if (secF) {
+      const qs = SECTIONS[secF] ? SECTIONS[secF].qs : CORE_QS;
+      const vals = qs.map(q => scoreVal(d[q])).filter(s => s !== null);
+      return vals.length ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length*100) : 0;
+    }
+    const vals = CORE_QS.map(q => scoreVal(d[q])).filter(s => s !== null);
+    return vals.length ? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length*100) : 0;
+  };
+
+  filtered.sort((a,b) => getScore(b) - getScore(a));
+  const maxScore = filtered.length ? getScore(filtered[0]) : 100;
+  const secColor = secF && SECTIONS[secF] ? SECTIONS[secF].color : 'var(--gold)';
+
+  const list = document.getElementById('ranking-list');
+  list.innerHTML = filtered.map((d, i) => {
+    const score = getScore(d);
+    const rc = regionClass(d.region);
+    return `<div class="rank-row" onclick="goToCountry('${d.country}')">
+      <div class="rank-num">${i+1}</div>
+      <div class="rank-country">${flagEmoji(d.iso2)} ${d.country}</div>
+      <div class="rank-bar-wrap"><div class="rank-bar-fill" style="width:${maxScore ? score/maxScore*100 : 0}%;background:${secColor}"></div></div>
+      <div class="rank-score">${score}<span style="font-size:12px;color:var(--text3)">%</span></div>
+      <div class="rank-region pill-${rc}">${REGION_SHORT[d.region]||d.region}</div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════
+// VIEW 5 — QUESTIONS
+// ═══════════════════════════════════════
+function buildQuestionList() {
+  const list = document.getElementById('q-list');
+  const allQs = Object.entries(QUESTIONS);
+  list.innerHTML = allQs.map(([q, text]) =>
+    `<div class="q-list-item" id="qli-${q.replace('.','_').replace(' ','_')}" onclick="selectQuestion('${q}')">
+      <div class="q-list-id">${q}</div>
+      <div class="q-list-text">${text.replace(/↳ /g,'').length > 55 ? text.replace(/↳ /g,'').slice(0,53)+'…' : text.replace(/↳ /g,'')}</div>
+    </div>`
+  ).join('');
+  selectQuestion('B1.1');
+}
+
+function selectQuestion(q) {
+  document.querySelectorAll('.q-list-item').forEach(el => el.classList.remove('active'));
+  const elId = 'qli-' + q.replace('.','_').replace(' ','_');
+  const el = document.getElementById(elId);
+  if (el) { el.classList.add('active'); el.scrollIntoView({block:'nearest'}); }
+
+  const counts = { Y:0, P:0, U:0, N:0, null:0 };
+  DATA.forEach(d => {
+    const v = hmValNorm(d[q]);
+    if (v) counts[v]++; else counts.null++;
+  });
+  const total = DATA.length;
+
+  const entries = [
+    {k:'Y', label:'Yes / Full', color: 'var(--Y)'},
+    {k:'P', label:'Partial', color: 'var(--P)'},
+    {k:'U', label:'Under development', color: 'var(--U)'},
+    {k:'N', label:'No', color: 'var(--N)'},
+    {k:'null', label:'No data', color: 'var(--bg4)'},
+  ].filter(e => counts[e.k] > 0);
+
+  const maxCount = Math.max(...entries.map(e => counts[e.k]));
+  const pctY = Math.round((counts.Y||0)/total*100);
+
+  // Countries by value
+  const byVal = {};
+  DATA.forEach(d => {
+    const v = hmValNorm(d[q]) || 'null';
+    if (!byVal[v]) byVal[v] = [];
+    byVal[v].push(d);
+  });
+
+  let detail = `<div class="q-detail-card">
+    <div class="q-detail-id">${q}</div>
+    <div class="q-detail-title">${QUESTIONS[q]||q}</div>
+    <div style="display:flex;gap:20px;align-items:flex-start;margin-bottom:20px;flex-wrap:wrap">
+      <div>
+        ${buildDonut(counts, total)}
+      </div>
+      <div style="flex:1;min-width:200px">
+        <div class="q-result-bars">
+        ${entries.map(e => `<div class="q-res-row">
+          <div class="q-res-val" style="color:${e.color}">${e.k === 'null' ? '–' : e.k}</div>
+          <div class="q-res-label">${e.label}</div>
+          <div class="q-res-bar-track"><div class="q-res-bar-fill" style="width:${counts[e.k]/maxCount*100}%;background:${e.color}"></div></div>
+          <div class="q-res-count">${counts[e.k]}</div>
+        </div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+
+  // Regional breakdown
+  const regions = [...new Set(DATA.map(d=>d.region))].filter(Boolean);
+  detail += `<div style="margin-bottom:16px">
+    <div class="card-title" style="margin-bottom:10px">By Region</div>
+    <div style="display:flex;flex-direction:column;gap:6px">`;
+  regions.forEach(r => {
+    const rc = DATA.filter(d => d.region === r);
+    const yc = rc.filter(d => hmValNorm(d[q]) === 'Y').length;
+    const pc = rc.filter(d => ['P','U'].includes(hmValNorm(d[q]))).length;
+    const nc = rc.filter(d => hmValNorm(d[q]) === 'N').length;
+    const rcls = regionClass(r);
+    detail += `<div style="display:grid;grid-template-columns:140px 1fr 80px;gap:8px;align-items:center">
+      <div class="r-${rcls}" style="font-size:11px">${REGION_SHORT[r]||r}</div>
+      <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;gap:1px">
+        <div style="width:${yc/rc.length*100}%;background:var(--Y)"></div>
+        <div style="width:${pc/rc.length*100}%;background:var(--P)"></div>
+        <div style="width:${nc/rc.length*100}%;background:var(--N);opacity:0.6"></div>
+      </div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--text2)">${yc}/${rc.length} Yes</div>
+    </div>`;
+  });
+  detail += '</div></div>';
+
+  // Country chips grouped by answer
+  ['Y','P','U','N'].filter(v => byVal[v] && byVal[v].length).forEach(v => {
+    const label = {Y:'Yes',P:'Partial',U:'Under development',N:'No'}[v];
+    const color = VAL_COLORS[v];
+    detail += `<div style="margin-bottom:12px">
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:${color};margin-bottom:6px;letter-spacing:0.08em">${label} (${byVal[v].length})</div>
+      <div class="q-country-grid">
+        ${(byVal[v]||[]).map(d => `<div class="q-country-chip" onclick="goToCountry('${d.country}')">
+          <span style="font-size:11px">${flagEmoji(d.iso2)} ${d.country}</span>
+          <span style="font-size:9px;color:${VAL_COLORS[v]}">${v}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  });
+
+  detail += '</div>';
+  document.getElementById('q-detail').innerHTML = detail;
+}
+
+function buildDonut(counts, total) {
+  const order = ['Y','P','U','N','null'];
+  const colors = { Y:'var(--Y)', P:'var(--P)', U:'var(--U)', N:'var(--N)', null:'rgba(255,255,255,0.06)' };
+  const cx=70, cy=70, r=54, iR=34;
+  let angle = -Math.PI/2;
+  let segs = '';
+  const pctY = Math.round((counts.Y||0)/total*100);
+
+  order.forEach(k => {
+    const n = counts[k]||0;
+    if (!n) return;
+    const sweep = (n/total)*2*Math.PI;
+    const x1=cx+r*Math.cos(angle), y1=cy+r*Math.sin(angle);
+    const x2=cx+r*Math.cos(angle+sweep), y2=cy+r*Math.sin(angle+sweep);
+    const ix1=cx+iR*Math.cos(angle), iy1=cy+iR*Math.sin(angle);
+    const ix2=cx+iR*Math.cos(angle+sweep), iy2=cy+iR*Math.sin(angle+sweep);
+    const large = sweep > Math.PI ? 1 : 0;
+    segs += `<path d="M${x1},${y1} A${r},${r},0,${large},1,${x2},${y2} L${ix2},${iy2} A${iR},${iR},0,${large},0,${ix1},${iy1} Z" fill="${colors[k]}" opacity="0.9"/>`;
+    angle += sweep;
+  });
+  return `<svg width="140" height="140" viewBox="0 0 140 140">
+    ${segs}
+    <text x="70" y="66" text-anchor="middle" font-family="DM Serif Display,serif" font-size="22" fill="var(--gold)">${pctY}%</text>
+    <text x="70" y="80" text-anchor="middle" font-family="DM Mono,monospace" font-size="9" fill="var(--text3)">YES</text>
+  </svg>`;
+}
+
+// ═══════════════════════════════════════
+// KICK OFF
+// ═══════════════════════════════════════
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
